@@ -4,22 +4,23 @@ using BankingSimulation.Application.Commands;
 using BankingSimulation.Domain.AccountHolders;
 using BankingSimulation.Domain.Accounts;
 using Xunit;
+using BankingSimulation.Domain.AccountLogs;
 
 namespace BankingSimulation.Application.Test.Commands
 {
     public class AddAccountCommandTests : RequestTestBase<AddAccountCommandHandler>
     {
-        private readonly Mock<IAccountService> mockAccountService;
+        private readonly Mock<IAccountService> mockAccountService = new();
 
-        private readonly Mock<IAccountHolderService> mockAccountHolderService;
+        private readonly Mock<IAccountHolderService> mockAccountHolderService = new();
+
+        private readonly Mock<IAccountLogService> mockAccountLogService = new();
 
         private readonly AddAccountCommandHandler handler;
 
         public AddAccountCommandTests()
         {
-            mockAccountService = new();
-            mockAccountHolderService = new();
-            handler = new AddAccountCommandHandler(mockAccountService.Object, mockAccountHolderService.Object, mockLogger.Object);
+            handler = new AddAccountCommandHandler(mockAccountService.Object, mockAccountHolderService.Object, mockAccountLogService.Object, mockLogger.Object);
         }
 
         [Fact]
@@ -73,6 +74,59 @@ namespace BankingSimulation.Application.Test.Commands
 
             // Then
             result.Succeeded.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task ShouldAddAccountCreatedEvent()
+        {
+            // Given
+            var account = new Account
+            {
+                AccountType = AccountType.Savings,
+                AccountHolder = new AccountHolder
+                {
+                    Id = Guid.NewGuid(),
+                    FullName = "Test Person",
+                    PublicIdentifier = Guid.NewGuid()
+                }
+            };
+
+            mockAccountService.Setup(x => x.Add(It.IsAny<Account>())).Returns((Account account) => account);
+
+            // When
+            var result = await handler.Handle(new AddAccountCommand { Account = account }, CancellationToken.None);
+
+            // Then
+            mockAccountLogService.Verify(x => x.Add(It.Is<AccountLog>(l => l.EventType == AccountEventType.Created)));
+            result.Succeeded.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task ShouldAddAccountLinkedEventForCheckingAccount()
+        {
+            // Given
+            var linkedAccountId = Guid.NewGuid();
+            var account = new Account
+            {
+                AccountType = AccountType.Checking,
+                AccountHolder = new AccountHolder
+                {
+                    Id = Guid.NewGuid(),
+                    FullName = "Test Person",
+                    PublicIdentifier = Guid.NewGuid()
+                },
+                LinkedAccountId = linkedAccountId
+            };
+
+            mockAccountService.Setup(x => x.Add(It.IsAny<Account>())).Returns((Account account) => account);
+            mockAccountService.Setup(x => x.Get(It.Is<Guid>(i => i == linkedAccountId))).Returns(new Account { Id = linkedAccountId });
+
+            // When
+            var result = await handler.Handle(new AddAccountCommand { Account = account }, CancellationToken.None);
+
+            // Then
+            mockAccountLogService.Verify(x => x.Add(It.Is<AccountLog>(l => l.EventType == AccountEventType.Linked && l.AccountId == linkedAccountId && l.Metadata.ContainsKey("LinkedAccountId"))));
+            result.Succeeded.Should().BeTrue();
         }
 
         [Fact]

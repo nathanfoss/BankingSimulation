@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using BankingSimulation.Application.Models;
 using BankingSimulation.Domain.Accounts;
+using BankingSimulation.Domain.AccountLogs;
 
 namespace BankingSimulation.Application.Commands
 {
@@ -16,11 +17,14 @@ namespace BankingSimulation.Application.Commands
     {
         private readonly IAccountService accountService;
 
+        private readonly IAccountLogService accountLogService;
+
         private readonly ILogger<DepositMoneyCommandHandler> logger;
 
-        public DepositMoneyCommandHandler(IAccountService accountService, ILogger<DepositMoneyCommandHandler> logger)
+        public DepositMoneyCommandHandler(IAccountService accountService, IAccountLogService accountLogService, ILogger<DepositMoneyCommandHandler> logger)
         {
             this.accountService = accountService;
+            this.accountLogService = accountLogService;
             this.logger = logger;
         }
 
@@ -35,13 +39,31 @@ namespace BankingSimulation.Application.Commands
                 }
 
                 account.Balance += request.Amount;
-                return Task.FromResult(Result<Account>.Success(accountService.Update(account)));
+                var result = accountService.Update(account);
+                AddAccountLog(result, request.Amount);
+                return Task.FromResult(Result<Account>.Success(result));
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "An unexpected error occurred depositing money into account {account}", request.AccountId);
                 return Task.FromResult(Result<Account>.Failure(ex));
             }
+        }
+
+        private void AddAccountLog(Account account, decimal amount)
+        {
+            accountLogService.Add(new AccountLog
+            {
+                Id = Guid.NewGuid(),
+                AccountId = account.Id,
+                CreatedDate = DateTime.UtcNow,
+                EventType = AccountEventType.Deposit,
+                Metadata = new Dictionary<string, string>()
+                {
+                    { "Amount", $"{amount}" },
+                    { "Balance", $"{account.Balance}" }
+                }
+            });
         }
     }
 }

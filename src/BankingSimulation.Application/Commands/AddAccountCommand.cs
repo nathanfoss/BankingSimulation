@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using BankingSimulation.Application.Models;
-using BankingSimulation.Application.Queries;
 using BankingSimulation.Domain.AccountHolders;
 using BankingSimulation.Domain.Accounts;
+using BankingSimulation.Domain.AccountLogs;
 
 namespace BankingSimulation.Application.Commands
 {
@@ -18,12 +18,16 @@ namespace BankingSimulation.Application.Commands
 
         private readonly IAccountHolderService accountHolderService;
 
+        private readonly IAccountLogService accountLogService;
+
         private readonly ILogger<AddAccountCommandHandler> logger;
 
-        public AddAccountCommandHandler(IAccountService accountService, IAccountHolderService accountHolderService, ILogger<AddAccountCommandHandler> logger)
+        public AddAccountCommandHandler(IAccountService accountService, IAccountHolderService accountHolderService,
+            IAccountLogService accountLogService, ILogger<AddAccountCommandHandler> logger)
         {
             this.accountService = accountService;
             this.accountHolderService = accountHolderService;
+            this.accountLogService = accountLogService;
             this.logger = logger;
         }
 
@@ -35,12 +39,40 @@ namespace BankingSimulation.Application.Commands
                 ValidateLinkedAccount(account);
                 ValidateAccountHolder(account);
                 var result = accountService.Add(account);
+                AddAccountLog(result);
                 return Task.FromResult(Result<Guid>.Success(result.Id));
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "An unexpected error occurred");
                 return Task.FromResult(Result<Guid>.Failure(ex));
+            }
+        }
+
+        private void AddAccountLog(Account account)
+        {
+            accountLogService.Add(new AccountLog
+            {
+                Id = Guid.NewGuid(),
+                AccountId = account.Id,
+                CreatedDate = DateTime.UtcNow,
+                EventType = AccountEventType.Created,
+                Metadata = new Dictionary<string, string>()
+            });
+
+            if (account.AccountType == AccountType.Checking)
+            {
+                accountLogService.Add(new AccountLog
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = account.LinkedAccountId.Value,
+                    CreatedDate = DateTime.UtcNow,
+                    EventType = AccountEventType.Linked,
+                    Metadata = new Dictionary<string, string>
+                    {
+                        { "LinkedAccountId", account.Id.ToString() }
+                    }
+                });
             }
         }
 
