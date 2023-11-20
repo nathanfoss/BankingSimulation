@@ -14,7 +14,12 @@
 
         public override string ToString()
         {
-            return $"Account {AccountId}: {EventType}: at {CreatedDate.ToString("f")} -- Metadata {Metadata}";
+            var metadata = string.Empty;
+            foreach (var data in Metadata)
+            {
+                metadata += $"{data.Key}: {data.Value} \r\n";
+            }
+            return $"Account {AccountId}: {EventType}: at {CreatedDate.ToString("f")} \r\n {metadata}";
         }
     }
 }
