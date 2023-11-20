@@ -6,29 +6,29 @@ using BankingSimulation.Domain.AccountLogs;
 
 namespace BankingSimulation.Application.Commands
 {
-    public class DepositMoneyCommand : IRequest<Result<Account>>
+    public class WithdrawMoneyCommand : IRequest<Result<Account>>
     {
         public Guid AccountId { get; set; }
 
         public decimal Amount { get; set; }
     }
 
-    public class DepositMoneyCommandHandler : IRequestHandler<DepositMoneyCommand, Result<Account>>
+    public class WithdrawMoneyCommandHandler : IRequestHandler<WithdrawMoneyCommand, Result<Account>>
     {
         private readonly IAccountService accountService;
 
         private readonly IAccountLogService accountLogService;
 
-        private readonly ILogger<DepositMoneyCommandHandler> logger;
+        private readonly ILogger<WithdrawMoneyCommandHandler> logger;
 
-        public DepositMoneyCommandHandler(IAccountService accountService, IAccountLogService accountLogService, ILogger<DepositMoneyCommandHandler> logger)
+        public WithdrawMoneyCommandHandler(IAccountService accountService, IAccountLogService accountLogService, ILogger<WithdrawMoneyCommandHandler> logger)
         {
             this.accountService = accountService;
             this.accountLogService = accountLogService;
             this.logger = logger;
         }
 
-        public Task<Result<Account>> Handle(DepositMoneyCommand request, CancellationToken cancellationToken)
+        public Task<Result<Account>> Handle(WithdrawMoneyCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -43,14 +43,19 @@ namespace BankingSimulation.Application.Commands
                     throw new Exception($"Account {request.AccountId} does not exist");
                 }
 
-                account.Balance += request.Amount;
+                if (account.Balance < request.Amount)
+                {
+                    throw new Exception($"Account {request.AccountId} has insufficient funds to complete this withdrawal");
+                }
+
+                account.Balance -= request.Amount;
                 var result = accountService.Update(account);
                 AddAccountLog(result, request.Amount);
                 return Task.FromResult(Result<Account>.Success(result));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "An unexpected error occurred depositing money into account {account}", request.AccountId);
+                logger.LogError(ex, "An unexpected error occurred withdrawing money from account {Account}", request.AccountId);
                 return Task.FromResult(Result<Account>.Failure(ex));
             }
         }
@@ -62,7 +67,7 @@ namespace BankingSimulation.Application.Commands
                 Id = Guid.NewGuid(),
                 AccountId = account.Id,
                 CreatedDate = DateTime.UtcNow,
-                EventType = AccountEventType.Deposit,
+                EventType = AccountEventType.Withdraw,
                 Metadata = new Dictionary<string, string>()
                 {
                     { "Amount", $"{amount}" },

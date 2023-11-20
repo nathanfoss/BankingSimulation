@@ -11,5 +11,10 @@
         public DateTime CreatedDate { get; set; }
 
         public IDictionary<string, string> Metadata { get; set; }
+
+        public override string ToString()
+        {
+            return $"Account {AccountId}: {EventType}: at {CreatedDate.ToString("f")} -- Metadata {Metadata}";
+        }
     }
 }

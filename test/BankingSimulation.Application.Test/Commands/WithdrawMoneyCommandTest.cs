@@ -7,17 +7,17 @@ using BankingSimulation.Domain.AccountLogs;
 
 namespace BankingSimulation.Application.Test.Commands
 {
-    public class DepositMoneyCommandTest : RequestTestBase<DepositMoneyCommandHandler>
+    public class WithdrawMoneyCommandTest : RequestTestBase<WithdrawMoneyCommandHandler>
     {
         private readonly Mock<IAccountService> mockAccountService = new();
 
         private readonly Mock<IAccountLogService> mockAccountLogService = new();
 
-        private readonly DepositMoneyCommandHandler handler;
+        private readonly WithdrawMoneyCommandHandler handler;
 
-        public DepositMoneyCommandTest()
+        public WithdrawMoneyCommandTest()
         {
-            handler = new DepositMoneyCommandHandler(mockAccountService.Object, mockAccountLogService.Object, mockLogger.Object);
+            handler = new WithdrawMoneyCommandHandler(mockAccountService.Object, mockAccountLogService.Object, mockLogger.Object);
         }
 
         [Fact]
@@ -26,7 +26,7 @@ namespace BankingSimulation.Application.Test.Commands
             // Given
 
             // When
-            var result = await handler.Handle(new DepositMoneyCommand
+            var result = await handler.Handle(new WithdrawMoneyCommand
             {
                 AccountId = Guid.NewGuid(),
                 Amount = -100
@@ -43,7 +43,29 @@ namespace BankingSimulation.Application.Test.Commands
             mockAccountService.Setup(x => x.Get(It.IsAny<Guid>())).Returns(default(Account));
 
             // When
-            var result = await handler.Handle(new DepositMoneyCommand(), CancellationToken.None);
+            var result = await handler.Handle(new WithdrawMoneyCommand(), CancellationToken.None);
+
+            // Then
+            result.Succeeded.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task ShouldReturnFailureWhenAccountHasInsufficientFunds()
+        {
+            // Given
+            mockAccountService.Setup(x => x.Get(It.IsAny<Guid>())).Returns((Guid id) => new Account
+            {
+                Id = id,
+                AccountType = AccountType.Savings,
+                Balance = 5
+            });
+
+            // When
+            var result = await handler.Handle(new WithdrawMoneyCommand
+            {
+                AccountId = Guid.NewGuid(),
+                Amount = 100
+            }, CancellationToken.None);
 
             // Then
             result.Succeeded.Should().BeFalse();
@@ -57,17 +79,17 @@ namespace BankingSimulation.Application.Test.Commands
             mockAccountService.Setup(x => x.Get(It.IsAny<Guid>())).Returns((Guid id) => new Account
             {
                 Id = id,
-                Balance = 0,
+                Balance = 100,
                 AccountType = AccountType.Checking
             });
             mockAccountService.Setup(x => x.Update(It.IsAny<Account>())).Returns((Account account) => account);
 
             // When
-            var result = await handler.Handle(new DepositMoneyCommand { AccountId = accountId, Amount = 100 }, CancellationToken.None);
+            var result = await handler.Handle(new WithdrawMoneyCommand { AccountId = accountId, Amount = 10 }, CancellationToken.None);
 
             // Then
             result.Succeeded.Should().BeTrue();
-            mockAccountLogService.Verify(x => x.Add(It.Is<AccountLog>(l => l.EventType == AccountEventType.Deposit && l.Metadata.ContainsKey("Amount") && l.Metadata.ContainsKey("Balance"))));
+            mockAccountLogService.Verify(x => x.Add(It.Is<AccountLog>(l => l.EventType == AccountEventType.Withdraw && l.Metadata.ContainsKey("Amount") && l.Metadata.ContainsKey("Balance"))));
         }
     }
 }
