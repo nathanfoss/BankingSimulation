@@ -7,7 +7,7 @@ Provide checking and savings account options for clients (checking accounts must
 Each customer can view all of their assigned accounts and view a full transaction history for each account.
 
 ## Architecture
-Console Application Leveraging the Domain-Driven Design (DDD) Pattern.
-CQRS Powered by MediatR
-Automated testing provided by XUnit
-Quality gateways provided by husky commit hooks
+- Console Application Leveraging the Domain-Driven Design (DDD) Pattern.
+- CQRS Powered by MediatR
+- Automated testing provided by XUnit
+- Quality gateways provided by husky commit hooks
