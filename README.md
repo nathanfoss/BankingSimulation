@@ -11,6 +11,4 @@ Each customer can view all of their assigned accounts and view a full transactio
 - CQRS Powered by MediatR
 - Automated testing provided by XUnit
 - Quality gateways provided by husky commit hooks
-
-## Roadmap
-- Event-Driven Architecture for creating Audit Logs
+- Event-Driven Architecture using background services
