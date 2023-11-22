@@ -5,6 +5,7 @@ using BankingSimulation.Domain.AccountHolders;
 using BankingSimulation.Domain.Accounts;
 using Xunit;
 using BankingSimulation.Domain.AccountLogs;
+using BankingSimulation.Domain.Events;
 
 namespace BankingSimulation.Application.Test.Commands
 {
@@ -14,13 +15,13 @@ namespace BankingSimulation.Application.Test.Commands
 
         private readonly Mock<IAccountHolderService> mockAccountHolderService = new();
 
-        private readonly Mock<IAccountLogService> mockAccountLogService = new();
+        private readonly Mock<IAccountEventService> mockAccountEventService = new();
 
         private readonly AddAccountCommandHandler handler;
 
         public AddAccountCommandTests()
         {
-            handler = new AddAccountCommandHandler(mockAccountService.Object, mockAccountHolderService.Object, mockAccountLogService.Object, mockLogger.Object);
+            handler = new AddAccountCommandHandler(mockAccountService.Object, mockAccountHolderService.Object, mockAccountEventService.Object, mockLogger.Object);
         }
 
         [Fact]
@@ -97,7 +98,7 @@ namespace BankingSimulation.Application.Test.Commands
             var result = await handler.Handle(new AddAccountCommand { Account = account }, CancellationToken.None);
 
             // Then
-            mockAccountLogService.Verify(x => x.Add(It.Is<AccountLog>(l => l.EventType == AccountEventType.Created)));
+            mockAccountEventService.Verify(x => x.Add(It.Is<IEnumerable<AccountEvent>>(l => l.All(e => e.Name == EventTypes.AccountCreated))));
             result.Succeeded.Should().BeTrue();
         }
 
@@ -125,7 +126,7 @@ namespace BankingSimulation.Application.Test.Commands
             var result = await handler.Handle(new AddAccountCommand { Account = account }, CancellationToken.None);
 
             // Then
-            mockAccountLogService.Verify(x => x.Add(It.Is<AccountLog>(l => l.EventType == AccountEventType.Linked && l.AccountId == linkedAccountId && l.Metadata.ContainsKey("LinkedAccountId"))));
+            mockAccountEventService.Verify(x => x.Add(It.Is<IEnumerable<AccountEvent>>(l => l.Any(e => e.Name == EventTypes.AccountLinked))));
             result.Succeeded.Should().BeTrue();
         }
 

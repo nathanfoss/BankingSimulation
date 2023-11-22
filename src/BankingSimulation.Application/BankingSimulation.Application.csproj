@@ -9,11 +9,11 @@
   <ItemGroup>
     <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BankingSimulation.Domain\BankingSimulation.Domain.csproj" />
-    <ProjectReference Include="..\BankingSimulation.Infrastructure\BankingSimulation.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

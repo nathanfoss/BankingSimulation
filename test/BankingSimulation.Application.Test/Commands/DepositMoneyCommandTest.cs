@@ -3,7 +3,7 @@ using Moq;
 using BankingSimulation.Application.Commands;
 using BankingSimulation.Domain.Accounts;
 using Xunit;
-using BankingSimulation.Domain.AccountLogs;
+using BankingSimulation.Domain.Events;
 
 namespace BankingSimulation.Application.Test.Commands
 {
@@ -11,13 +11,13 @@ namespace BankingSimulation.Application.Test.Commands
     {
         private readonly Mock<IAccountService> mockAccountService = new();
 
-        private readonly Mock<IAccountLogService> mockAccountLogService = new();
+        private readonly Mock<IAccountEventService> mockAccountEventService = new();
 
         private readonly DepositMoneyCommandHandler handler;
 
         public DepositMoneyCommandTest()
         {
-            handler = new DepositMoneyCommandHandler(mockAccountService.Object, mockAccountLogService.Object, mockLogger.Object);
+            handler = new DepositMoneyCommandHandler(mockAccountService.Object, mockAccountEventService.Object, mockLogger.Object);
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace BankingSimulation.Application.Test.Commands
         }
 
         [Fact]
-        public async Task ShouldAddLog()
+        public async Task ShouldPublishEvent()
         {
             // Given
             var accountId = Guid.NewGuid();
@@ -67,7 +67,7 @@ namespace BankingSimulation.Application.Test.Commands
 
             // Then
             result.Succeeded.Should().BeTrue();
-            mockAccountLogService.Verify(x => x.Add(It.Is<AccountLog>(l => l.EventType == AccountEventType.Deposit && l.Metadata.ContainsKey("Amount") && l.Metadata.ContainsKey("Balance"))));
+            mockAccountEventService.Verify(x => x.Add(It.Is<AccountEvent>(l => l.Name == EventTypes.MoneyDeposited)));
         }
     }
 }

@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BankingSimulation.Application\BankingSimulation.Application.csproj" />
     <ProjectReference Include="..\BankingSimulation.Domain\BankingSimulation.Domain.csproj" />
   </ItemGroup>
 

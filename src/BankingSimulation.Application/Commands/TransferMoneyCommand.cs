@@ -2,7 +2,8 @@
 using Microsoft.Extensions.Logging;
 using BankingSimulation.Application.Models;
 using BankingSimulation.Domain.Accounts;
-using BankingSimulation.Domain.AccountLogs;
+using BankingSimulation.Domain.Events;
+using Newtonsoft.Json;
 
 namespace BankingSimulation.Application.Commands
 {
@@ -19,14 +20,14 @@ namespace BankingSimulation.Application.Commands
     {
         private readonly IAccountService accountService;
 
-        private readonly IAccountLogService accountLogService;
+        private readonly IAccountEventService accountEventService;
 
         private readonly ILogger<TransferMoneyCommandHandler> logger;
 
-        public TransferMoneyCommandHandler(IAccountService accountService, IAccountLogService accountLogService, ILogger<TransferMoneyCommandHandler> logger)
+        public TransferMoneyCommandHandler(IAccountService accountService, IAccountEventService accountEventService, ILogger<TransferMoneyCommandHandler> logger)
         {
             this.accountService = accountService;
-            this.accountLogService = accountLogService;
+            this.accountEventService = accountEventService;
             this.logger = logger;
         }
 
@@ -54,7 +55,7 @@ namespace BankingSimulation.Application.Commands
                 var fromResult = accountService.Update(fromAccount);
                 var toResult = accountService.Update(toAccount);
 
-                AddAccountLog(fromResult, toResult, request.Amount);
+                PublishAccountEvent(fromResult, toResult, request.Amount);
                 return Task.FromResult(Result<Account>.Success(toResult));
             }
             catch (Exception ex)
@@ -76,36 +77,13 @@ namespace BankingSimulation.Application.Commands
             return account;
         }
 
-        private void AddAccountLog(Account fromAccount, Account toAccount, decimal amount)
+        private void PublishAccountEvent(Account fromAccount, Account toAccount, decimal amount)
         {
-            accountLogService.Add(new List<AccountLog>
+            accountEventService.Add(new AccountEvent
             {
-                new AccountLog
-                {
-                    Id = Guid.NewGuid(),
-                    AccountId = fromAccount.Id,
-                    CreatedDate = DateTime.UtcNow,
-                    EventType = AccountEventType.Transfer,
-                    Metadata = new Dictionary<string, string>()
-                    {
-                        { "ToAccount", $"{toAccount.Id}" },
-                        { "Amount", $"{amount}" },
-                        { "Balance", $"{fromAccount.Balance}" }
-                    }
-                },
-                new AccountLog
-                {
-                    Id = Guid.NewGuid(),
-                    AccountId = toAccount.Id,
-                    CreatedDate = DateTime.UtcNow,
-                    EventType = AccountEventType.Transfer,
-                    Metadata = new Dictionary<string, string>()
-                    {
-                        { "FromAccount", $"{fromAccount.Id}" },
-                        { "Amount", $"{amount}" },
-                        { "Balance", $"{toAccount.Balance}" }
-                    }
-                }
+                Id = Guid.NewGuid(),
+                Name = EventTypes.MoneyTransferred,
+                Payload = JsonConvert.SerializeObject((fromAccount, toAccount, amount))
             });
         }
     }

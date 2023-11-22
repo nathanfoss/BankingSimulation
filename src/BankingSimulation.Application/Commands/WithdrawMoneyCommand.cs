@@ -3,6 +3,8 @@ using Microsoft.Extensions.Logging;
 using BankingSimulation.Application.Models;
 using BankingSimulation.Domain.Accounts;
 using BankingSimulation.Domain.AccountLogs;
+using BankingSimulation.Domain.Events;
+using Newtonsoft.Json;
 
 namespace BankingSimulation.Application.Commands
 {
@@ -17,14 +19,14 @@ namespace BankingSimulation.Application.Commands
     {
         private readonly IAccountService accountService;
 
-        private readonly IAccountLogService accountLogService;
+        private readonly IAccountEventService accountEventService;
 
         private readonly ILogger<WithdrawMoneyCommandHandler> logger;
 
-        public WithdrawMoneyCommandHandler(IAccountService accountService, IAccountLogService accountLogService, ILogger<WithdrawMoneyCommandHandler> logger)
+        public WithdrawMoneyCommandHandler(IAccountService accountService, IAccountEventService accountEventService, ILogger<WithdrawMoneyCommandHandler> logger)
         {
             this.accountService = accountService;
-            this.accountLogService = accountLogService;
+            this.accountEventService = accountEventService;
             this.logger = logger;
         }
 
@@ -50,7 +52,7 @@ namespace BankingSimulation.Application.Commands
 
                 account.Balance -= request.Amount;
                 var result = accountService.Update(account);
-                AddAccountLog(result, request.Amount);
+                PublishAccountEvent(result, request.Amount);
                 return Task.FromResult(Result<Account>.Success(result));
             }
             catch (Exception ex)
@@ -60,19 +62,13 @@ namespace BankingSimulation.Application.Commands
             }
         }
 
-        private void AddAccountLog(Account account, decimal amount)
+        private void PublishAccountEvent(Account account, decimal amount)
         {
-            accountLogService.Add(new AccountLog
+            accountEventService.Add(new AccountEvent
             {
                 Id = Guid.NewGuid(),
-                AccountId = account.Id,
-                CreatedDate = DateTime.UtcNow,
-                EventType = AccountEventType.Withdraw,
-                Metadata = new Dictionary<string, string>()
-                {
-                    { "Amount", $"{amount}" },
-                    { "Balance", $"{account.Balance}" }
-                }
+                Name = EventTypes.MoneyWithdrawn,
+                Payload = JsonConvert.SerializeObject((account, amount))
             });
         }
     }

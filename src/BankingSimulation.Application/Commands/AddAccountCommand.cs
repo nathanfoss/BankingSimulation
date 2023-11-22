@@ -4,6 +4,9 @@ using BankingSimulation.Application.Models;
 using BankingSimulation.Domain.AccountHolders;
 using BankingSimulation.Domain.Accounts;
 using BankingSimulation.Domain.AccountLogs;
+using BankingSimulation.Domain.Events;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace BankingSimulation.Application.Commands
 {
@@ -18,16 +21,16 @@ namespace BankingSimulation.Application.Commands
 
         private readonly IAccountHolderService accountHolderService;
 
-        private readonly IAccountLogService accountLogService;
+        private readonly IAccountEventService accountEventService;
 
         private readonly ILogger<AddAccountCommandHandler> logger;
 
         public AddAccountCommandHandler(IAccountService accountService, IAccountHolderService accountHolderService,
-            IAccountLogService accountLogService, ILogger<AddAccountCommandHandler> logger)
+            IAccountEventService accountEventService, ILogger<AddAccountCommandHandler> logger)
         {
             this.accountService = accountService;
             this.accountHolderService = accountHolderService;
-            this.accountLogService = accountLogService;
+            this.accountEventService = accountEventService;
             this.logger = logger;
         }
 
@@ -39,7 +42,7 @@ namespace BankingSimulation.Application.Commands
                 ValidateLinkedAccount(account);
                 ValidateAccountHolder(account);
                 var result = accountService.Add(account);
-                AddAccountLog(result);
+                PublishAccountEvent(result);
                 return Task.FromResult(Result<Guid>.Success(result.Id));
             }
             catch (Exception ex)
@@ -49,31 +52,29 @@ namespace BankingSimulation.Application.Commands
             }
         }
 
-        private void AddAccountLog(Account account)
+        private void PublishAccountEvent(Account account)
         {
-            accountLogService.Add(new AccountLog
+            var events = new List<AccountEvent>
             {
-                Id = Guid.NewGuid(),
-                AccountId = account.Id,
-                CreatedDate = DateTime.UtcNow,
-                EventType = AccountEventType.Created,
-                Metadata = new Dictionary<string, string>()
-            });
+                new AccountEvent
+                {
+                    Id = Guid.NewGuid(),
+                    Name = EventTypes.AccountCreated,
+                    Payload = JsonConvert.SerializeObject(account)
+                }
+            };
 
             if (account.AccountType == AccountType.Checking)
             {
-                accountLogService.Add(new AccountLog
+                events.Add(new AccountEvent
                 {
                     Id = Guid.NewGuid(),
-                    AccountId = account.LinkedAccountId.Value,
-                    CreatedDate = DateTime.UtcNow,
-                    EventType = AccountEventType.Linked,
-                    Metadata = new Dictionary<string, string>
-                    {
-                        { "LinkedAccountId", account.Id.ToString() }
-                    }
+                    Name = EventTypes.AccountLinked,
+                    Payload = JsonConvert.SerializeObject(account)
                 });
             }
+
+            accountEventService.Add(events);
         }
 
         private void ValidateAccountHolder(Account account)
