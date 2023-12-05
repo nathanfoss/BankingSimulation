@@ -18,6 +18,7 @@ namespace BankingSimulation.Infrastructure.Accounts
 
         public Account Add(Account account)
         {
+            account.Id = Guid.NewGuid();
             _accounts.Add(account);
             return account;
         }

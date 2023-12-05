@@ -9,7 +9,6 @@ using BankingSimulation.Infrastructure.AccountLogs;
 using BankingSimulation.Infrastructure.Accounts;
 using BankingSimulation.Infrastructure.Events;
 using BankingSimulation.Infrastructure.Simulator;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

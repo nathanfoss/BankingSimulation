@@ -3,19 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34009.444
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankingSimulation.App", "src\BankingSimulation.App\BankingSimulation.App.csproj", "{A27AB0B0-D69E-46C0-8BA2-8333D2B5CCD3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankingSimulation.App", "src\BankingSimulation.App\BankingSimulation.App.csproj", "{A27AB0B0-D69E-46C0-8BA2-8333D2B5CCD3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EAF7FB8A-FFC4-43CA-AF1C-C11A3E72BAA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankingSimulation.Application", "src\BankingSimulation.Application\BankingSimulation.Application.csproj", "{25916B24-5405-4E53-825B-5A79ED2E0B3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankingSimulation.Application", "src\BankingSimulation.Application\BankingSimulation.Application.csproj", "{25916B24-5405-4E53-825B-5A79ED2E0B3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankingSimulation.Infrastructure", "src\BankingSimulation.Infrastructure\BankingSimulation.Infrastructure.csproj", "{2A6B6663-E786-4EE7-96F4-569D1F9F637D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankingSimulation.Infrastructure", "src\BankingSimulation.Infrastructure\BankingSimulation.Infrastructure.csproj", "{2A6B6663-E786-4EE7-96F4-569D1F9F637D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankingSimulation.Domain", "src\BankingSimulation.Domain\BankingSimulation.Domain.csproj", "{71EFBAA9-3899-4AA9-9BCE-8C48656D19AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankingSimulation.Domain", "src\BankingSimulation.Domain\BankingSimulation.Domain.csproj", "{71EFBAA9-3899-4AA9-9BCE-8C48656D19AD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{59090294-C86D-4AAB-8AC9-ADE0C9CFAD21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankingSimulation.Application.Test", "test\BankingSimulation.Application.Test\BankingSimulation.Application.Test.csproj", "{D9B7EA3A-02C3-4BA7-B528-63292A70960D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankingSimulation.Application.Test", "test\BankingSimulation.Application.Test\BankingSimulation.Application.Test.csproj", "{D9B7EA3A-02C3-4BA7-B528-63292A70960D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankingSimulation.API", "src\BankingSimulation.API\BankingSimulation.API.csproj", "{7FE40D76-B306-4689-8FCF-737303C38555}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,10 @@ Global
 		{D9B7EA3A-02C3-4BA7-B528-63292A70960D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9B7EA3A-02C3-4BA7-B528-63292A70960D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9B7EA3A-02C3-4BA7-B528-63292A70960D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FE40D76-B306-4689-8FCF-737303C38555}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FE40D76-B306-4689-8FCF-737303C38555}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FE40D76-B306-4689-8FCF-737303C38555}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FE40D76-B306-4689-8FCF-737303C38555}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{2A6B6663-E786-4EE7-96F4-569D1F9F637D} = {EAF7FB8A-FFC4-43CA-AF1C-C11A3E72BAA4}
 		{71EFBAA9-3899-4AA9-9BCE-8C48656D19AD} = {EAF7FB8A-FFC4-43CA-AF1C-C11A3E72BAA4}
 		{D9B7EA3A-02C3-4BA7-B528-63292A70960D} = {59090294-C86D-4AAB-8AC9-ADE0C9CFAD21}
+		{7FE40D76-B306-4689-8FCF-737303C38555} = {EAF7FB8A-FFC4-43CA-AF1C-C11A3E72BAA4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {22B5D679-17C3-4667-AFB0-E1E591632DAD}
