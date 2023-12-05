@@ -2,10 +2,10 @@
 {
     public interface IAccountHolderService
     {
-        AccountHolder Add(AccountHolder accountHolder);
+        Task<AccountHolder> Add(AccountHolder accountHolder);
 
-        AccountHolder Get(Guid id);
+        Task<AccountHolder> Get(Guid id);
 
-        AccountHolder GetByPublicIdentifier(Guid publicIdentifier);
+        Task<AccountHolder> GetByPublicIdentifier(Guid publicIdentifier);
     }
 }

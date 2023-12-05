@@ -30,7 +30,7 @@ namespace BankingSimulation.Application.Commands
             this.logger = logger;
         }
 
-        public Task<Result<Account>> Handle(WithdrawMoneyCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Account>> Handle(WithdrawMoneyCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace BankingSimulation.Application.Commands
                     throw new ArgumentException("Invalid deposit amount");
                 }
 
-                var account = accountService.Get(request.AccountId);
+                var account = await accountService.Get(request.AccountId);
                 if (account is null)
                 {
                     throw new Exception($"Account {request.AccountId} does not exist");
@@ -51,20 +51,20 @@ namespace BankingSimulation.Application.Commands
                 }
 
                 account.Balance -= request.Amount;
-                var result = accountService.Update(account);
-                PublishAccountEvent(result, request.Amount);
-                return Task.FromResult(Result<Account>.Success(result));
+                var result = await accountService.Update(account);
+                await PublishAccountEvent(result, request.Amount);
+                return Result<Account>.Success(result);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "An unexpected error occurred withdrawing money from account {Account}", request.AccountId);
-                return Task.FromResult(Result<Account>.Failure(ex));
+                return Result<Account>.Failure(ex);
             }
         }
 
-        private void PublishAccountEvent(Account account, decimal amount)
+        private async Task PublishAccountEvent(Account account, decimal amount)
         {
-            accountEventService.Add(new AccountEvent
+            await accountEventService.Add(new AccountEvent
             {
                 Id = Guid.NewGuid(),
                 Name = EventTypes.MoneyWithdrawn,

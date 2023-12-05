@@ -27,27 +27,27 @@ namespace BankingSimulation.Application.Commands
             this.logger = logger;
         }
 
-        public Task<Result<string>> Handle(AddAccountLogCommand request, CancellationToken cancellationToken)
+        public async Task<Result<string>> Handle(AddAccountLogCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var events = accountEventService.GetAll();
+                var events = await accountEventService.GetAll();
                 if (!events.Any())
                 {
-                    return Task.FromResult(Result<string>.Success("No events found"));
+                    return Result<string>.Success("No events found");
                 }
 
-                ProcessEvents(events);
-                return Task.FromResult(Result<string>.Success("Events Handled"));
+                await ProcessEvents(events);
+                return Result<string>.Success("Events Handled");
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Unexpected error occurred handling events");
-                return Task.FromResult(Result<string>.Failure(ex));
+                return Result<string>.Failure(ex);
             }
         }
 
-        private void ProcessEvents(IEnumerable<AccountEvent> events)
+        private async Task ProcessEvents(IEnumerable<AccountEvent> events)
         {
             var groups = events.GroupBy(e => e.Name);
             foreach (var group in groups)
@@ -55,25 +55,25 @@ namespace BankingSimulation.Application.Commands
                 switch (group.Key)
                 {
                     case EventTypes.AccountCreated:
-                        ProcessAccountCreatedEvents(group.Select(x => x));
+                        await ProcessAccountCreatedEvents(group.Select(x => x));
                         break;
                     case EventTypes.AccountLinked:
-                        ProcessAccountLinkedEvents(group.Select(x => x));
+                        await ProcessAccountLinkedEvents(group.Select(x => x));
                         break;
                     case EventTypes.AccountReassigned:
-                        ProcessAccountReassignedEvents(group.Select(x => x));
+                        await ProcessAccountReassignedEvents(group.Select(x => x));
                         break;
                     case EventTypes.AccountClosed:
-                        ProcessAccountClosedEvents(group.Select(x => x));
+                        await ProcessAccountClosedEvents(group.Select(x => x));
                         break;
                     case EventTypes.MoneyDeposited:
-                        ProcessMoneyDepositedEvents(group.Select(x => x));
+                        await ProcessMoneyDepositedEvents(group.Select(x => x));
                         break;
                     case EventTypes.MoneyWithdrawn:
-                        ProcessMoneyWithdrawnEvents(group.Select(x => x));
+                        await ProcessMoneyWithdrawnEvents(group.Select(x => x));
                         break;
                     case EventTypes.MoneyTransferred:
-                        ProcessMoneyTransferredEvents(group.Select(x => x));
+                        await ProcessMoneyTransferredEvents(group.Select(x => x));
                         break;
                     default:
                         logger.LogWarning("Event Type {EventType} is unhandled and is being ignored", group.Key);
@@ -82,7 +82,7 @@ namespace BankingSimulation.Application.Commands
             }
         }
 
-        private void ProcessMoneyWithdrawnEvents(IEnumerable<AccountEvent> events)
+        private async Task ProcessMoneyWithdrawnEvents(IEnumerable<AccountEvent> events)
         {
             var logs = events.Select(e =>
             {
@@ -92,7 +92,7 @@ namespace BankingSimulation.Application.Commands
                     Id = Guid.NewGuid(),
                     AccountId = payload.Item1.Id,
                     CreatedDate = DateTime.UtcNow,
-                    EventType = AccountEventType.Withdraw,
+                    EventType = AccountEventTypeEnum.Withdraw,
                     Metadata = new Dictionary<string, string>()
                     {
                         { "Amount", $"{payload.Item2}" },
@@ -101,11 +101,11 @@ namespace BankingSimulation.Application.Commands
                 };
             });
 
-            accountLogService.Add(logs);
-            accountEventService.Remove(events);
+            await accountLogService.Add(logs);
+            await accountEventService.Remove(events);
         }
 
-        private void ProcessMoneyTransferredEvents(IEnumerable<AccountEvent> events)
+        private async Task ProcessMoneyTransferredEvents(IEnumerable<AccountEvent> events)
         {
             var logs = events.Select(e =>
             {
@@ -117,7 +117,7 @@ namespace BankingSimulation.Application.Commands
                         Id = Guid.NewGuid(),
                         AccountId = payload.Item1.Id,
                         CreatedDate = DateTime.UtcNow,
-                        EventType = AccountEventType.Transfer,
+                        EventType = AccountEventTypeEnum.Transfer,
                         Metadata = new Dictionary<string, string>()
                         {
                             { "ToAccount", $"{payload.Item2.Id}" },
@@ -130,7 +130,7 @@ namespace BankingSimulation.Application.Commands
                         Id = Guid.NewGuid(),
                         AccountId = payload.Item2.Id,
                         CreatedDate = DateTime.UtcNow,
-                        EventType = AccountEventType.Transfer,
+                        EventType = AccountEventTypeEnum.Transfer,
                         Metadata = new Dictionary<string, string>()
                         {
                             { "FromAccount", $"{payload.Item1.Id}" },
@@ -141,11 +141,11 @@ namespace BankingSimulation.Application.Commands
                 };
             }).SelectMany(x => x);
 
-            accountLogService.Add(logs);
-            accountEventService.Remove(events);
+            await accountLogService.Add(logs);
+            await accountEventService.Remove(events);
         }
 
-        private void ProcessMoneyDepositedEvents(IEnumerable<AccountEvent> events)
+        private async Task ProcessMoneyDepositedEvents(IEnumerable<AccountEvent> events)
         {
             var logs = events.Select(e =>
             {
@@ -155,7 +155,7 @@ namespace BankingSimulation.Application.Commands
                     Id = Guid.NewGuid(),
                     AccountId = payload.Item1.Id,
                     CreatedDate = DateTime.UtcNow,
-                    EventType = AccountEventType.Deposit,
+                    EventType = AccountEventTypeEnum.Deposit,
                     Metadata = new Dictionary<string, string>()
                     {
                         { "Amount", $"{payload.Item2}" },
@@ -164,11 +164,11 @@ namespace BankingSimulation.Application.Commands
                 };
             });
 
-            accountLogService.Add(logs);
-            accountEventService.Remove(events);
+            await accountLogService.Add(logs);
+            await accountEventService.Remove(events);
         }
 
-        private void ProcessAccountClosedEvents(IEnumerable<AccountEvent> events)
+        private async Task ProcessAccountClosedEvents(IEnumerable<AccountEvent> events)
         {
             var logs = events.Select(e =>
             {
@@ -177,17 +177,17 @@ namespace BankingSimulation.Application.Commands
                 {
                     Id = Guid.NewGuid(),
                     CreatedDate = DateTime.Now,
-                    EventType = AccountEventType.Closed,
+                    EventType = AccountEventTypeEnum.Closed,
                     AccountId = account.Id,
                     Metadata = new Dictionary<string, string>()
                 };
             });
 
-            accountLogService.Add(logs);
-            accountEventService.Remove(events);
+            await accountLogService.Add(logs);
+            await accountEventService.Remove(events);
         }
 
-        private void ProcessAccountReassignedEvents(IEnumerable<AccountEvent> events)
+        private async Task ProcessAccountReassignedEvents(IEnumerable<AccountEvent> events)
         {
             var logs = events.Select(e =>
             {
@@ -196,7 +196,7 @@ namespace BankingSimulation.Application.Commands
                 {
                     Id = Guid.NewGuid(),
                     CreatedDate = DateTime.Now,
-                    EventType = AccountEventType.Reassigned,
+                    EventType = AccountEventTypeEnum.Reassigned,
                     AccountId = account.Id,
                     Metadata = new Dictionary<string, string>
                     {
@@ -205,11 +205,11 @@ namespace BankingSimulation.Application.Commands
                 };
             });
 
-            accountLogService.Add(logs);
-            accountEventService.Remove(events);
+            await accountLogService.Add(logs);
+            await accountEventService.Remove(events);
         }
 
-        private void ProcessAccountCreatedEvents(IEnumerable<AccountEvent> events)
+        private async Task ProcessAccountCreatedEvents(IEnumerable<AccountEvent> events)
         {
             var logs = events.Select(e =>
             {
@@ -218,17 +218,17 @@ namespace BankingSimulation.Application.Commands
                 {
                     Id = Guid.NewGuid(),
                     CreatedDate = DateTime.Now,
-                    EventType = AccountEventType.Created,
+                    EventType = AccountEventTypeEnum.Created,
                     AccountId = account.Id,
                     Metadata = new Dictionary<string, string>()
                 };
             });
 
-            accountLogService.Add(logs);
-            accountEventService.Remove(events);
+            await accountLogService.Add(logs);
+            await accountEventService.Remove(events);
         }
 
-        private void ProcessAccountLinkedEvents(IEnumerable<AccountEvent> events)
+        private async Task ProcessAccountLinkedEvents(IEnumerable<AccountEvent> events)
         {
             var logs = events.Select(e =>
             {
@@ -237,7 +237,7 @@ namespace BankingSimulation.Application.Commands
                 {
                     Id = Guid.NewGuid(),
                     CreatedDate = DateTime.Now,
-                    EventType = AccountEventType.Linked,
+                    EventType = AccountEventTypeEnum.Linked,
                     AccountId = account.LinkedAccountId.Value,
                     Metadata = new Dictionary<string, string>
                     {
@@ -246,8 +246,8 @@ namespace BankingSimulation.Application.Commands
                 };
             });
 
-            accountLogService.Add(logs);
-            accountEventService.Remove(events);
+            await accountLogService.Add(logs);
+            await accountEventService.Remove(events);
         }
     }
 }

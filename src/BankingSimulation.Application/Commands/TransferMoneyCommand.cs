@@ -31,7 +31,7 @@ namespace BankingSimulation.Application.Commands
             this.logger = logger;
         }
 
-        public Task<Result<Account>> Handle(TransferMoneyCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Account>> Handle(TransferMoneyCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -41,8 +41,8 @@ namespace BankingSimulation.Application.Commands
                 }
 
 
-                var fromAccount = ValidateAccount(request.FromAccountId);
-                var toAccount = ValidateAccount(request.ToAccountId);
+                var fromAccount = await ValidateAccount(request.FromAccountId);
+                var toAccount = await ValidateAccount(request.ToAccountId);
 
                 if (fromAccount.Balance < request.Amount)
                 {
@@ -52,23 +52,23 @@ namespace BankingSimulation.Application.Commands
                 fromAccount.Balance -= request.Amount;
                 toAccount.Balance += request.Amount;
 
-                var fromResult = accountService.Update(fromAccount);
-                var toResult = accountService.Update(toAccount);
+                var fromResult = await accountService.Update(fromAccount);
+                var toResult = await accountService.Update(toAccount);
 
-                PublishAccountEvent(fromResult, toResult, request.Amount);
-                return Task.FromResult(Result<Account>.Success(toResult));
+                await PublishAccountEvent(fromResult, toResult, request.Amount);
+                return Result<Account>.Success(toResult);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "An unexpected error occurred transfering money from account {FromAccount} to account {ToAccount}",
                     request.FromAccountId, request.ToAccountId);
-                return Task.FromResult(Result<Account>.Failure(ex));
+                return Result<Account>.Failure(ex);
             }
         }
 
-        private Account ValidateAccount(Guid accountId)
+        private async Task<Account> ValidateAccount(Guid accountId)
         {
-            var account = accountService.Get(accountId);
+            var account = await accountService.Get(accountId);
             if (account is null)
             {
                 throw new Exception($"Account {accountId} does not exist");
@@ -77,9 +77,9 @@ namespace BankingSimulation.Application.Commands
             return account;
         }
 
-        private void PublishAccountEvent(Account fromAccount, Account toAccount, decimal amount)
+        private async Task PublishAccountEvent(Account fromAccount, Account toAccount, decimal amount)
         {
-            accountEventService.Add(new AccountEvent
+            await accountEventService.Add(new AccountEvent
             {
                 Id = Guid.NewGuid(),
                 Name = EventTypes.MoneyTransferred,

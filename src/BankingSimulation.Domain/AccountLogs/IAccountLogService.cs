@@ -2,10 +2,10 @@
 {
     public interface IAccountLogService
     {
-        void Add(AccountLog accountLog);
+        Task Add(AccountLog accountLog);
 
-        void Add(IEnumerable<AccountLog> accountLogs);
+        Task Add(IEnumerable<AccountLog> accountLogs);
 
-        IEnumerable<AccountLog> GetByAccount(Guid accountId);
+        Task<IEnumerable<AccountLog>> GetByAccount(Guid accountId);
     }
 }

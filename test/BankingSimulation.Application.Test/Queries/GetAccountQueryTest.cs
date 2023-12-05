@@ -24,7 +24,7 @@ namespace BankingSimulation.Application.Test.Queries
         public async Task ShouldReturnSuccess()
         {
             // Given
-            mockAccountService.Setup(x => x.Get(It.IsAny<Guid>())).Returns(new Account());
+            mockAccountService.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(new Account());
 
             // When
             var result = await target.Handle(new GetAccountQuery(), CancellationToken.None);

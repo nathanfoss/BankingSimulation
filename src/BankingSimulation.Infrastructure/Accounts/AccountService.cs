@@ -1,41 +1,45 @@
-﻿using BankingSimulation.Domain.Accounts;
+﻿using BankingSimulation.Domain;
+using BankingSimulation.Domain.Accounts;
+using Microsoft.EntityFrameworkCore;
 
 namespace BankingSimulation.Infrastructure.Accounts
 {
     public class AccountService : IAccountService
     {
-        private List<Account> _accounts;
+        private readonly BankDbContext context;
 
-        public AccountService()
+        public AccountService(BankDbContext context)
         {
-            _accounts = new List<Account>();
+            this.context = context;
         }
 
-        public Account Get(Guid id)
+        public async Task<Account> Get(Guid id)
         {
-            return _accounts.FirstOrDefault(a => a.Id == id);
+            return await context.Accounts.FindAsync(id);
         }
 
-        public Account Add(Account account)
+        public async Task<Account> Add(Account account)
         {
-            account.Id = Guid.NewGuid();
-            _accounts.Add(account);
-            return account;
+            var added = context.Accounts.Add(account);
+            await context.SaveChangesAsync();
+            return added.Entity;
         }
 
-        public Account Update(Account account)
+        public async Task<Account> Update(Account account)
         {
-            var accountToUpdate = _accounts.First(x => x.Id == account.Id);
+            var accountToUpdate = await Get(account.Id);
             accountToUpdate.Balance = account.Balance;
             accountToUpdate.AccountHolderId = account.AccountHolderId;
             accountToUpdate.AccountHolder = account.AccountHolder;
             accountToUpdate.LinkedAccountId = account.LinkedAccountId;
+
+            await context.SaveChangesAsync();
             return accountToUpdate;
         }
 
-        public IEnumerable<Account> GetByAccountHolder(Guid accountHolderId)
+        public async Task<IEnumerable<Account>> GetByAccountHolder(Guid accountHolderId)
         {
-            return _accounts.Where(x => x.AccountHolderId == accountHolderId);
+            return await context.Accounts.Where(x => x.AccountHolderId == accountHolderId).ToListAsync();
         }
     }
 }

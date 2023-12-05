@@ -3,10 +3,9 @@ using Microsoft.Extensions.Logging;
 using BankingSimulation.Application.Models;
 using BankingSimulation.Domain.AccountHolders;
 using BankingSimulation.Domain.Accounts;
-using BankingSimulation.Domain.AccountLogs;
 using BankingSimulation.Domain.Events;
-using System.Text.Json.Serialization;
 using Newtonsoft.Json;
+using BankingSimulation.Domain.AccountTypes;
 
 namespace BankingSimulation.Application.Commands
 {
@@ -34,25 +33,25 @@ namespace BankingSimulation.Application.Commands
             this.logger = logger;
         }
 
-        public Task<Result<Guid>> Handle(AddAccountCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(AddAccountCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var account = request.Account;
-                ValidateLinkedAccount(account);
-                ValidateAccountHolder(account);
-                var result = accountService.Add(account);
-                PublishAccountEvent(result);
-                return Task.FromResult(Result<Guid>.Success(result.Id));
+                await ValidateLinkedAccount(account);
+                await ValidateAccountHolder(account);
+                var result = await accountService.Add(account);
+                await PublishAccountEvent(result);
+                return Result<Guid>.Success(result.Id);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "An unexpected error occurred");
-                return Task.FromResult(Result<Guid>.Failure(ex));
+                return Result<Guid>.Failure(ex);
             }
         }
 
-        private void PublishAccountEvent(Account account)
+        private async Task PublishAccountEvent(Account account)
         {
             var events = new List<AccountEvent>
             {
@@ -64,7 +63,7 @@ namespace BankingSimulation.Application.Commands
                 }
             };
 
-            if (account.AccountType == AccountType.Checking)
+            if (account.AccountTypeId == AccountTypeEnum.Checking)
             {
                 events.Add(new AccountEvent
                 {
@@ -74,17 +73,17 @@ namespace BankingSimulation.Application.Commands
                 });
             }
 
-            accountEventService.Add(events);
+            await accountEventService.Add(events);
         }
 
-        private void ValidateAccountHolder(Account account)
+        private async Task ValidateAccountHolder(Account account)
         {
             if (account.AccountHolder is null)
             {
                 throw new Exception("Account holder should not be null");
             }
 
-            var accountHolder = accountHolderService.GetByPublicIdentifier(account.AccountHolder.PublicIdentifier);
+            var accountHolder = await accountHolderService.GetByPublicIdentifier(account.AccountHolder.PublicIdentifier);
             if (accountHolder is not null)
             {
                 account.AccountHolderId = accountHolder.Id;
@@ -93,18 +92,18 @@ namespace BankingSimulation.Application.Commands
 
             var holder = account.AccountHolder;
             holder.Id = Guid.NewGuid();
-            accountHolderService.Add(holder);
+            await accountHolderService.Add(holder);
             account.AccountHolderId = holder.Id;
         }
 
-        private void ValidateLinkedAccount(Account account)
+        private async Task ValidateLinkedAccount(Account account)
         {
-            if (account.AccountType == AccountType.Savings)
+            if (account.AccountTypeId == AccountTypeEnum.Savings)
             {
                 return;
             }
 
-            var linkedAccount = accountService.Get(account.LinkedAccountId.Value);
+            var linkedAccount = await accountService.Get(account.LinkedAccountId.Value);
             if (linkedAccount == null)
             {
                 throw new Exception($"Invalid linked account: {account.LinkedAccountId}");

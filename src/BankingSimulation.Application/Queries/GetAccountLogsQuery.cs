@@ -22,17 +22,17 @@ namespace BankingSimulation.Application.Queries
             this.logger = logger;
         }
 
-        public Task<Result<IEnumerable<AccountLog>>> Handle(GetAccountLogsQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<AccountLog>>> Handle(GetAccountLogsQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var logs = accountLogService.GetByAccount(request.AccountId);
-                return Task.FromResult(Result<IEnumerable<AccountLog>>.Success(logs));
+                var logs = await accountLogService.GetByAccount(request.AccountId);
+                return Result<IEnumerable<AccountLog>>.Success(logs);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error retrieving logs for account {Account}", request.AccountId);
-                return Task.FromResult(Result<IEnumerable<AccountLog>>.Failure(ex));
+                return Result<IEnumerable<AccountLog>>.Failure(ex);
             }
         }
     }

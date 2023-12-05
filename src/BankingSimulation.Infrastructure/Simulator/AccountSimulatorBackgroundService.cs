@@ -2,6 +2,7 @@
 using BankingSimulation.Application.Queries;
 using BankingSimulation.Domain.AccountHolders;
 using BankingSimulation.Domain.Accounts;
+using BankingSimulation.Domain.AccountTypes;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,14 +35,14 @@ namespace BankingSimulation.Infrastructure.Simulator
             var account1 = new Account
             {
                 Id = Guid.NewGuid(),
-                AccountType = AccountType.Savings,
+                AccountTypeId = AccountTypeEnum.Savings,
                 AccountHolder = accountHolder1,
                 Balance = 0.0m
             };
             var account2 = new Account
             {
                 Id = Guid.NewGuid(),
-                AccountType = AccountType.Checking,
+                AccountTypeId = AccountTypeEnum.Checking,
                 AccountHolder = accountHolder1,
                 Balance = 0.0m,
                 LinkedAccountId = account1.Id,

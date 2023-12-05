@@ -4,6 +4,7 @@ using BankingSimulation.Application.Commands;
 using BankingSimulation.Domain.Accounts;
 using Xunit;
 using BankingSimulation.Domain.Events;
+using BankingSimulation.Domain.AccountTypes;
 
 namespace BankingSimulation.Application.Test.Commands
 {
@@ -40,7 +41,7 @@ namespace BankingSimulation.Application.Test.Commands
         public async Task ShouldReturnFailureWhenAccountNotExist()
         {
             // Given
-            mockAccountService.Setup(x => x.Get(It.IsAny<Guid>())).Returns(default(Account));
+            mockAccountService.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(default(Account));
 
             // When
             var result = await handler.Handle(new DepositMoneyCommand(), CancellationToken.None);
@@ -54,13 +55,13 @@ namespace BankingSimulation.Application.Test.Commands
         {
             // Given
             var accountId = Guid.NewGuid();
-            mockAccountService.Setup(x => x.Get(It.IsAny<Guid>())).Returns((Guid id) => new Account
+            mockAccountService.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync((Guid id) => new Account
             {
                 Id = id,
                 Balance = 0,
-                AccountType = AccountType.Checking
+                AccountTypeId = AccountTypeEnum.Checking
             });
-            mockAccountService.Setup(x => x.Update(It.IsAny<Account>())).Returns((Account account) => account);
+            mockAccountService.Setup(x => x.Update(It.IsAny<Account>())).ReturnsAsync((Account account) => account);
 
             // When
             var result = await handler.Handle(new DepositMoneyCommand { AccountId = accountId, Amount = 100 }, CancellationToken.None);

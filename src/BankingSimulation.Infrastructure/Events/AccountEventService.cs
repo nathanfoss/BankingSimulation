@@ -1,37 +1,45 @@
-﻿using BankingSimulation.Domain.Events;
+﻿using BankingSimulation.Domain;
+using BankingSimulation.Domain.Events;
+using Microsoft.EntityFrameworkCore;
 
 namespace BankingSimulation.Infrastructure.Events
 {
     public class AccountEventService : IAccountEventService
     {
-        private readonly List<AccountEvent> accountEvents = new();
+        private readonly BankDbContext context;
 
-        public void Add(AccountEvent accountEvent)
+        public AccountEventService(BankDbContext context)
         {
-            accountEvents.Add(accountEvent);
+            this.context = context;
         }
 
-        public void Add(IEnumerable<AccountEvent> accountEvents)
+        public async Task Add(AccountEvent accountEvent)
         {
-            this.accountEvents.AddRange(accountEvents);
+            context.AccountEvents.Add(accountEvent);
+            await context.SaveChangesAsync();
         }
 
-        public IEnumerable<AccountEvent> GetAll()
+        public async Task Add(IEnumerable<AccountEvent> accountEvents)
         {
-            return accountEvents;
+            context.AccountEvents.AddRange(accountEvents);
+            await context.SaveChangesAsync();
         }
 
-        public void Remove(AccountEvent accountEvent)
+        public async Task<IEnumerable<AccountEvent>> GetAll()
         {
-            accountEvents.Remove(accountEvent);
+            return await context.AccountEvents.ToListAsync();
         }
 
-        public void Remove(IEnumerable<AccountEvent> accountEvents)
+        public async Task Remove(AccountEvent accountEvent)
         {
-            foreach (var accountEvent in accountEvents)
-            {
-                Remove(accountEvent);
-            }
+            context.AccountEvents.Remove(accountEvent);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task Remove(IEnumerable<AccountEvent> accountEvents)
+        {
+            context.AccountEvents.RemoveRange(accountEvents);
+            await context.SaveChangesAsync();
         }
     }
 }

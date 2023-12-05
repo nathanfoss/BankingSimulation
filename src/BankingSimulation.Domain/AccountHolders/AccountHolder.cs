@@ -1,9 +1,9 @@
-﻿namespace BankingSimulation.Domain.AccountHolders
-{
-    public class AccountHolder
-    {
-        public Guid Id { get; set; }
+﻿using BankingSimulation.Domain.Core;
 
+namespace BankingSimulation.Domain.AccountHolders
+{
+    public class AccountHolder : EntityBase<Guid>
+    {
         public string FullName { get; set; }
 
         public Guid PublicIdentifier { get; set; }

@@ -1,30 +1,33 @@
-﻿using BankingSimulation.Domain.AccountHolders;
+﻿using BankingSimulation.Domain;
+using BankingSimulation.Domain.AccountHolders;
+using Microsoft.EntityFrameworkCore;
 
 namespace BankingSimulation.Infrastructure.AccountHolders
 {
     public class AccountHolderService : IAccountHolderService
     {
-        private List<AccountHolder> _accountHolders;
+        private readonly BankDbContext context;
 
-        public AccountHolderService()
+        public AccountHolderService(BankDbContext context)
         {
-            _accountHolders = new List<AccountHolder>();
+            this.context = context;
         }
 
-        public AccountHolder Add(AccountHolder accountHolder)
+        public async Task<AccountHolder> Add(AccountHolder accountHolder)
         {
-            _accountHolders.Add(accountHolder);
+            context.AccountHolders.Add(accountHolder);
+            await context.SaveChangesAsync();
             return accountHolder;
         }
 
-        public AccountHolder Get(Guid id)
+        public async Task<AccountHolder> Get(Guid id)
         {
-            return _accountHolders.FirstOrDefault(x => x.Id == id);
+            return await context.AccountHolders.FindAsync(id);
         }
 
-        public AccountHolder GetByPublicIdentifier(Guid publicIdentifier)
+        public async Task<AccountHolder> GetByPublicIdentifier(Guid publicIdentifier)
         {
-            return _accountHolders.FirstOrDefault(x => x.PublicIdentifier == publicIdentifier);
+            return await context.AccountHolders.FirstOrDefaultAsync(x => x.PublicIdentifier == publicIdentifier);
         }
     }
 }

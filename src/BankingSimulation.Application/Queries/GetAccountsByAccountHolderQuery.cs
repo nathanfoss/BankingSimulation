@@ -22,17 +22,17 @@ namespace BankingSimulation.Application.Queries
             this.logger = logger;
         }
 
-        public Task<Result<IEnumerable<Account>>> Handle(GetAccountsByAccountHolderQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<Account>>> Handle(GetAccountsByAccountHolderQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var accounts = accountService.GetByAccountHolder(request.AccountHolderPublicIdentifier);
-                return Task.FromResult(Result<IEnumerable<Account>>.Success(accounts));
+                var accounts = await accountService.GetByAccountHolder(request.AccountHolderPublicIdentifier);
+                return Result<IEnumerable<Account>>.Success(accounts);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Unexpected error getting accounts for account holder {AccountHolder}", request.AccountHolderPublicIdentifier);
-                return Task.FromResult(Result<IEnumerable<Account>>.Failure(ex));
+                return Result<IEnumerable<Account>>.Failure(ex);
             }
         }
     }

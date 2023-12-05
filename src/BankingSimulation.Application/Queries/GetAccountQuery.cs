@@ -23,17 +23,17 @@ namespace BankingSimulation.Application.Queries
             this.logger = logger;
         }
 
-        public Task<Result<Account>> Handle(GetAccountQuery request, CancellationToken cancellationToken)
+        public async Task<Result<Account>> Handle(GetAccountQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = accountService.Get(request.AccountId);
-                return Task.FromResult(Result<Account>.Success(result));
+                var result = await accountService.Get(request.AccountId);
+                return Result<Account>.Success(result);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "An unexpected error occurred");
-                return Task.FromResult(Result<Account>.Failure(ex));
+                return Result<Account>.Failure(ex);
             }
         }
     }

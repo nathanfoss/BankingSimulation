@@ -2,12 +2,12 @@
 {
     public interface IAccountService
     {
-        Account Get(Guid id);
+        Task<Account> Get(Guid id);
 
-        Account Add(Account account);
+        Task<Account> Add(Account account);
 
-        Account Update(Account account);
+        Task<Account> Update(Account account);
 
-        IEnumerable<Account> GetByAccountHolder(Guid accountHolderId);
+        Task<IEnumerable<Account>> GetByAccountHolder(Guid accountHolderId);
     }
 }

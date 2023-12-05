@@ -1,14 +1,16 @@
 ﻿using BankingSimulation.Domain.AccountHolders;
+using BankingSimulation.Domain.AccountTypes;
+using BankingSimulation.Domain.Core;
 
 namespace BankingSimulation.Domain.Accounts
 {
-    public class Account
+    public class Account : EntityBase<Guid>
     {
-        public Guid Id { get; set; }
-
         public Guid AccountHolderId { get; set; }
 
         public AccountHolder AccountHolder { get; set; }
+
+        public AccountTypeEnum AccountTypeId { get; set; }
 
         public AccountType AccountType { get; set; }
 
@@ -20,7 +22,7 @@ namespace BankingSimulation.Domain.Accounts
 
         public override string ToString()
         {
-            return $"{AccountType}: {Id.ToString().Substring(Id.ToString().Length - 4)}: ${Balance}";
+            return $"{AccountTypeId}: {Id.ToString().Substring(Id.ToString().Length - 4)}: ${Balance}";
         }
     }
 }

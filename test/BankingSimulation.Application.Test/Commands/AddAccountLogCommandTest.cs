@@ -25,10 +25,10 @@ namespace BankingSimulation.Application.Test.Commands
 
         [Theory]
         [MemberData(nameof(GenerateTheoryData))]
-        public async Task ShouldProcessEvents((List<AccountEvent>, AccountEventType) testData)
+        public async Task ShouldProcessEvents((List<AccountEvent>, AccountEventTypeEnum) testData)
         {
             // Given
-            mockAccountEventService.Setup(x => x.GetAll()).Returns(testData.Item1);
+            mockAccountEventService.Setup(x => x.GetAll()).ReturnsAsync(testData.Item1);
 
             // When
             var result = await handler.Handle(new AddAccountLogCommand(), CancellationToken.None);
@@ -39,7 +39,7 @@ namespace BankingSimulation.Application.Test.Commands
             mockAccountEventService.Verify(x => x.Remove(It.IsAny<IEnumerable<AccountEvent>>()));
         }
 
-        public static TheoryData<(List<AccountEvent>, AccountEventType)> GenerateTheoryData =>
+        public static TheoryData<(List<AccountEvent>, AccountEventTypeEnum)> GenerateTheoryData =>
             new()
             {
                 new()
@@ -53,7 +53,7 @@ namespace BankingSimulation.Application.Test.Commands
                             Payload = JsonConvert.SerializeObject(new Account())
                         }
                     },
-                    Item2 = AccountEventType.Created
+                    Item2 = AccountEventTypeEnum.Created
                 },
                 new()
                 {
@@ -69,7 +69,7 @@ namespace BankingSimulation.Application.Test.Commands
                             })
                         }
                     },
-                    Item2 = AccountEventType.Linked
+                    Item2 = AccountEventTypeEnum.Linked
                 },
                 new()
                 {
@@ -88,7 +88,7 @@ namespace BankingSimulation.Application.Test.Commands
                             })
                         }
                     },
-                    Item2 = AccountEventType.Reassigned
+                    Item2 = AccountEventTypeEnum.Reassigned
                 },
                 new()
                 {
@@ -101,7 +101,7 @@ namespace BankingSimulation.Application.Test.Commands
                             Payload = JsonConvert.SerializeObject(new Account())
                         }
                     },
-                    Item2 = AccountEventType.Closed
+                    Item2 = AccountEventTypeEnum.Closed
                 },
                 new()
                 {
@@ -114,7 +114,7 @@ namespace BankingSimulation.Application.Test.Commands
                             Payload = JsonConvert.SerializeObject((new Account(), 5))
                         }
                     },
-                    Item2 = AccountEventType.Deposit
+                    Item2 = AccountEventTypeEnum.Deposit
                 },
                 new()
                 {
@@ -127,7 +127,7 @@ namespace BankingSimulation.Application.Test.Commands
                             Payload = JsonConvert.SerializeObject((new Account(), 5))
                         }
                     },
-                    Item2 = AccountEventType.Withdraw
+                    Item2 = AccountEventTypeEnum.Withdraw
                 },
                 new()
                 {
@@ -140,7 +140,7 @@ namespace BankingSimulation.Application.Test.Commands
                             Payload = JsonConvert.SerializeObject((new Account(), new Account(), 5))
                         }
                     },
-                    Item2 = AccountEventType.Transfer
+                    Item2 = AccountEventTypeEnum.Transfer
                 }
             };
     }

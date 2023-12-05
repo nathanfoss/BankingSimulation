@@ -2,14 +2,14 @@
 {
     public interface IAccountEventService
     {
-        void Add(AccountEvent accountEvent);
+        Task Add(AccountEvent accountEvent);
 
-        void Add(IEnumerable<AccountEvent> accountEvents);
+        Task Add(IEnumerable<AccountEvent> accountEvents);
 
-        IEnumerable<AccountEvent> GetAll();
+        Task<IEnumerable<AccountEvent>> GetAll();
 
-        void Remove(AccountEvent accountEvent);
+        Task Remove(AccountEvent accountEvent);
 
-        void Remove(IEnumerable<AccountEvent> accountEvents);
+        Task Remove(IEnumerable<AccountEvent> accountEvents);
     }
 }

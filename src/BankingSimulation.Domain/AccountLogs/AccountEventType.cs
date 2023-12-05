@@ -1,13 +1,8 @@
-﻿namespace BankingSimulation.Domain.AccountLogs
+﻿using BankingSimulation.Domain.Core;
+
+namespace BankingSimulation.Domain.AccountLogs
 {
-    public enum AccountEventType
+    public class AccountEventType : EnumEntityBase<AccountEventTypeEnum>
     {
-        Created = 1,
-        Linked = 2,
-        Deposit = 3,
-        Withdraw = 4,
-        Transfer = 5,
-        Reassigned = 6,
-        Closed = 7
     }
 }

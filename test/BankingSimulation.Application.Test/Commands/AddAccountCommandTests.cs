@@ -6,6 +6,7 @@ using BankingSimulation.Domain.Accounts;
 using Xunit;
 using BankingSimulation.Domain.AccountLogs;
 using BankingSimulation.Domain.Events;
+using BankingSimulation.Domain.AccountTypes;
 
 namespace BankingSimulation.Application.Test.Commands
 {
@@ -30,7 +31,7 @@ namespace BankingSimulation.Application.Test.Commands
             // Given
             var account = new Account
             {
-                AccountType = AccountType.Checking,
+                AccountTypeId = AccountTypeEnum.Checking,
                 LinkedAccountId = null
             };
 
@@ -47,11 +48,11 @@ namespace BankingSimulation.Application.Test.Commands
             // Given
             var account = new Account
             {
-                AccountType = AccountType.Checking,
+                AccountTypeId = AccountTypeEnum.Checking,
                 LinkedAccountId = Guid.Empty
             };
 
-            mockAccountService.Setup(x => x.Get(It.IsAny<Guid>())).Returns(default(Account));
+            mockAccountService.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(default(Account));
 
             // When
             var result = await handler.Handle(new AddAccountCommand { Account = account }, CancellationToken.None);
@@ -66,7 +67,7 @@ namespace BankingSimulation.Application.Test.Commands
             // Given
             var account = new Account
             {
-                AccountType = AccountType.Savings,
+                AccountTypeId = AccountTypeEnum.Savings,
                 AccountHolder = null
             };
 
@@ -83,7 +84,7 @@ namespace BankingSimulation.Application.Test.Commands
             // Given
             var account = new Account
             {
-                AccountType = AccountType.Savings,
+                AccountTypeId = AccountTypeEnum.Savings,
                 AccountHolder = new AccountHolder
                 {
                     Id = Guid.NewGuid(),
@@ -92,7 +93,7 @@ namespace BankingSimulation.Application.Test.Commands
                 }
             };
 
-            mockAccountService.Setup(x => x.Add(It.IsAny<Account>())).Returns((Account account) => account);
+            mockAccountService.Setup(x => x.Add(It.IsAny<Account>())).ReturnsAsync((Account account) => account);
 
             // When
             var result = await handler.Handle(new AddAccountCommand { Account = account }, CancellationToken.None);
@@ -109,7 +110,7 @@ namespace BankingSimulation.Application.Test.Commands
             var linkedAccountId = Guid.NewGuid();
             var account = new Account
             {
-                AccountType = AccountType.Checking,
+                AccountTypeId = AccountTypeEnum.Checking,
                 AccountHolder = new AccountHolder
                 {
                     Id = Guid.NewGuid(),
@@ -119,8 +120,8 @@ namespace BankingSimulation.Application.Test.Commands
                 LinkedAccountId = linkedAccountId
             };
 
-            mockAccountService.Setup(x => x.Add(It.IsAny<Account>())).Returns((Account account) => account);
-            mockAccountService.Setup(x => x.Get(It.Is<Guid>(i => i == linkedAccountId))).Returns(new Account { Id = linkedAccountId });
+            mockAccountService.Setup(x => x.Add(It.IsAny<Account>())).ReturnsAsync((Account account) => account);
+            mockAccountService.Setup(x => x.Get(It.Is<Guid>(i => i == linkedAccountId))).ReturnsAsync(new Account { Id = linkedAccountId });
 
             // When
             var result = await handler.Handle(new AddAccountCommand { Account = account }, CancellationToken.None);
@@ -136,7 +137,7 @@ namespace BankingSimulation.Application.Test.Commands
             // Given
             var account = new Account
             {
-                AccountType = AccountType.Savings,
+                AccountTypeId = AccountTypeEnum.Savings,
                 AccountHolder = new AccountHolder
                 {
                     Id = Guid.NewGuid(),
@@ -145,7 +146,7 @@ namespace BankingSimulation.Application.Test.Commands
                 }
             };
 
-            mockAccountService.Setup(x => x.Add(It.IsAny<Account>())).Returns((Account account) => account);
+            mockAccountService.Setup(x => x.Add(It.IsAny<Account>())).ReturnsAsync((Account account) => account);
 
             // When
             var result = await handler.Handle(new AddAccountCommand { Account = account }, CancellationToken.None);
@@ -162,7 +163,7 @@ namespace BankingSimulation.Application.Test.Commands
             var accountHolderId = Guid.NewGuid();
             var account = new Account
             {
-                AccountType = AccountType.Savings,
+                AccountTypeId = AccountTypeEnum.Savings,
                 AccountHolder = new AccountHolder
                 {
                     FullName = "Test Person",
@@ -170,13 +171,13 @@ namespace BankingSimulation.Application.Test.Commands
                 }
             };
 
-            mockAccountHolderService.Setup(x => x.GetByPublicIdentifier(It.IsAny<Guid>())).Returns((Guid publicId) => new AccountHolder
+            mockAccountHolderService.Setup(x => x.GetByPublicIdentifier(It.IsAny<Guid>())).ReturnsAsync((Guid publicId) => new AccountHolder
             {
                 Id = accountHolderId,
                 FullName = "Some Person",
                 PublicIdentifier = Guid.NewGuid()
             });
-            mockAccountService.Setup(x => x.Add(It.IsAny<Account>())).Returns((Account account) => account);
+            mockAccountService.Setup(x => x.Add(It.IsAny<Account>())).ReturnsAsync((Account account) => account);
 
             // When
             var result = await handler.Handle(new AddAccountCommand { Account = account }, CancellationToken.None);

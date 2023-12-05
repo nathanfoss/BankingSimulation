@@ -4,7 +4,7 @@
     {
         public Guid Id { get; set; }
 
-        public AccountEventType EventType { get; set; }
+        public AccountEventTypeEnum EventType { get; set; }
 
         public Guid AccountId { get; set; }
 

@@ -4,6 +4,7 @@ using BankingSimulation.Application.Commands;
 using BankingSimulation.Domain.Accounts;
 using Xunit;
 using BankingSimulation.Domain.Events;
+using BankingSimulation.Domain.AccountTypes;
 
 namespace BankingSimulation.Application.Test.Commands
 {
@@ -43,8 +44,8 @@ namespace BankingSimulation.Application.Test.Commands
             // Given
             var fromAccountId = Guid.NewGuid();
             var toAccountId = Guid.NewGuid();
-            mockAccountService.Setup(x => x.Get(fromAccountId)).Returns(default(Account));
-            mockAccountService.Setup(x => x.Get(toAccountId)).Returns(new Account());
+            mockAccountService.Setup(x => x.Get(fromAccountId)).ReturnsAsync(default(Account));
+            mockAccountService.Setup(x => x.Get(toAccountId)).ReturnsAsync(new Account());
 
             // When
             var result = await handler.Handle(new TransferMoneyCommand
@@ -64,8 +65,8 @@ namespace BankingSimulation.Application.Test.Commands
             // Given
             var fromAccountId = Guid.NewGuid();
             var toAccountId = Guid.NewGuid();
-            mockAccountService.Setup(x => x.Get(fromAccountId)).Returns(new Account());
-            mockAccountService.Setup(x => x.Get(toAccountId)).Returns(default(Account));
+            mockAccountService.Setup(x => x.Get(fromAccountId)).ReturnsAsync(new Account());
+            mockAccountService.Setup(x => x.Get(toAccountId)).ReturnsAsync(default(Account));
 
             // When
             var result = await handler.Handle(new TransferMoneyCommand
@@ -85,8 +86,8 @@ namespace BankingSimulation.Application.Test.Commands
             // Given
             var fromAccountId = Guid.NewGuid();
             var toAccountId = Guid.NewGuid();
-            mockAccountService.Setup(x => x.Get(fromAccountId)).Returns(new Account());
-            mockAccountService.Setup(x => x.Get(toAccountId)).Returns(new Account());
+            mockAccountService.Setup(x => x.Get(fromAccountId)).ReturnsAsync(new Account());
+            mockAccountService.Setup(x => x.Get(toAccountId)).ReturnsAsync(new Account());
 
             // When
             var result = await handler.Handle(new TransferMoneyCommand
@@ -106,19 +107,19 @@ namespace BankingSimulation.Application.Test.Commands
             // Given
             var fromAccountId = Guid.NewGuid();
             var toAccountId = Guid.NewGuid();
-            mockAccountService.Setup(x => x.Get(fromAccountId)).Returns((Guid id) => new Account
+            mockAccountService.Setup(x => x.Get(fromAccountId)).ReturnsAsync((Guid id) => new Account
             {
                 Id = id,
                 Balance = 100,
-                AccountType = AccountType.Checking
+                AccountTypeId = AccountTypeEnum.Checking
             });
-            mockAccountService.Setup(x => x.Get(toAccountId)).Returns((Guid id) => new Account
+            mockAccountService.Setup(x => x.Get(toAccountId)).ReturnsAsync((Guid id) => new Account
             {
                 Id = id,
                 Balance = 100,
-                AccountType = AccountType.Checking
+                AccountTypeId = AccountTypeEnum.Checking
             });
-            mockAccountService.Setup(x => x.Update(It.IsAny<Account>())).Returns((Account account) => account);
+            mockAccountService.Setup(x => x.Update(It.IsAny<Account>())).ReturnsAsync((Account account) => account);
 
             // When
             var result = await handler.Handle(new TransferMoneyCommand { FromAccountId = fromAccountId, ToAccountId = toAccountId, Amount = 50 }, CancellationToken.None);
