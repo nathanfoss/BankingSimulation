@@ -15,7 +15,9 @@ namespace BankingSimulation.Infrastructure.Accounts
 
         public async Task<Account> Get(Guid id)
         {
-            return await context.Accounts.FindAsync(id);
+            return await context.Accounts
+                .Include(x => x.AccountType)
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Account> Add(Account account)

@@ -220,7 +220,9 @@ namespace BankingSimulation.Application.Commands
                     CreatedDate = DateTime.Now,
                     EventTypeId = AccountEventTypeEnum.Created,
                     AccountId = account.Id,
-                    Metadata = new Dictionary<string, string>()
+                    Metadata = new Dictionary<string, string> {
+                        { "Balance", "0.00" }
+                    }
                 };
             });
 

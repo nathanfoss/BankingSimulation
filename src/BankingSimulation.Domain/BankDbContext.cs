@@ -4,6 +4,7 @@ using BankingSimulation.Domain.Accounts;
 using BankingSimulation.Domain.AccountTypes;
 using BankingSimulation.Domain.Events;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.Linq;
 
 namespace BankingSimulation.Domain
@@ -17,7 +18,11 @@ namespace BankingSimulation.Domain
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<AccountLog>(b => b.Ignore(nameof(b.Metadata)));
+            modelBuilder.Entity<AccountLog>()
+            .Property(b => b.Metadata)
+            .HasConversion(
+                v => JsonConvert.SerializeObject(v),
+                v => JsonConvert.DeserializeObject<Dictionary<string, string>>(v));
         }
 
         public DbSet<Account> Accounts { get; set; }
