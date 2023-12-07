@@ -1,5 +1,5 @@
-using BankingSimulation.API.Models;
 using BankingSimulation.Application.Commands;
+using BankingSimulation.Application.Models;
 using BankingSimulation.Application.Queries;
 using BankingSimulation.Domain.AccountHolders;
 using BankingSimulation.Domain.Accounts;
@@ -56,16 +56,7 @@ namespace BankingSimulation.API.Controllers
         {
             var result = await mediator.Send(new AddAccountCommand
             {
-                Account = new Account
-                {
-                    LinkedAccountId = account.LinkedAccountId,
-                    AccountTypeId = account.AccountTypeId,
-                    AccountHolder = new AccountHolder
-                    {
-                        FullName = account.AccountHolderName,
-                        PublicIdentifier = account.AccountHolderPublicIdentifier
-                    }
-                }
+                Account = account
             }, cancellationToken);
 
             if (!result.Succeeded)

@@ -27,7 +27,11 @@ namespace BankingSimulation.Infrastructure.AccountLogs
 
         public async Task<IEnumerable<AccountLog>> GetByAccount(Guid accountId)
         {
-            return await context.AccountLogs.OrderByDescending(x => x.CreatedDate).Where(x => x.AccountId == accountId).ToListAsync();
+            return await context.AccountLogs
+                .Include(x => x.EventType)
+                .OrderByDescending(x => x.CreatedDate)
+                .Where(x => x.AccountId == accountId)
+                .ToListAsync();
         }
     }
 }

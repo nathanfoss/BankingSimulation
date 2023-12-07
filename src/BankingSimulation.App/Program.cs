@@ -31,7 +31,8 @@ var hostBuilder = Host.CreateDefaultBuilder()
                 cfg.RegisterServicesFromAssembly(typeof(GetAccountQuery).Assembly);
             })
             .AddHostedService<AccountEventBackgroundService>()
-            .AddHostedService<AccountSimulatorBackgroundService>();
+            .AddHostedService<AccountSimulatorBackgroundService>()
+            .AddHostedService<EnumSeedBackgroundService>();
     });
 
 using var host = hostBuilder.Build();

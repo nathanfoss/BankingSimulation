@@ -39,6 +39,24 @@ namespace BankingSimulation.Application.Test.Commands
         }
 
         [Fact]
+        public async Task ShouldReturnFailureWhenAccountsInvalid()
+        {
+            // Given
+            var accountId = Guid.NewGuid();
+
+            // When
+            var result = await handler.Handle(new TransferMoneyCommand
+            {
+                FromAccountId = accountId,
+                ToAccountId = accountId,
+                Amount = 100
+            }, CancellationToken.None);
+
+            // Then
+            result.Succeeded.Should().BeFalse();
+        }
+
+        [Fact]
         public async Task ShouldReturnFailureWhenFromAccountNotExist()
         {
             // Given

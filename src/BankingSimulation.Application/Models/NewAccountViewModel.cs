@@ -1,6 +1,6 @@
 ﻿using BankingSimulation.Domain.AccountTypes;
 
-namespace BankingSimulation.API.Models
+namespace BankingSimulation.Application.Models
 {
     public class NewAccountViewModel
     {

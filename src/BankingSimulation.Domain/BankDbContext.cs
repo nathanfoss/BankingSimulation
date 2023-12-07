@@ -17,18 +17,6 @@ namespace BankingSimulation.Domain
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<AccountType>().HasData(Enum.GetValues<AccountTypeEnum>().Select(id => new AccountType
-            {
-                Id = id,
-                Name = id.ToString()
-            }));
-
-            modelBuilder.Entity<AccountEventType>().HasData(Enum.GetValues<AccountEventTypeEnum>().Select(id => new AccountEventType
-            {
-                Id = id,
-                Name = id.ToString()
-            }));
-
             modelBuilder.Entity<AccountLog>(b => b.Ignore(nameof(b.Metadata)));
         }
 

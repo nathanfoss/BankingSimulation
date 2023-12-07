@@ -35,7 +35,7 @@ namespace BankingSimulation.Application.Test.Commands
 
             // Then
             result.Succeeded.Should().BeTrue();
-            mockAccountLogService.Verify(x => x.Add(It.Is<IEnumerable<AccountLog>>(l => l.All(log => log.EventType == testData.Item2))));
+            mockAccountLogService.Verify(x => x.Add(It.Is<IEnumerable<AccountLog>>(l => l.All(log => log.EventTypeId == testData.Item2))));
             mockAccountEventService.Verify(x => x.Remove(It.IsAny<IEnumerable<AccountEvent>>()));
         }
 

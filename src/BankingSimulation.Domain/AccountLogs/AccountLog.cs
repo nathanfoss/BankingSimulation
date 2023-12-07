@@ -1,12 +1,18 @@
-﻿namespace BankingSimulation.Domain.AccountLogs
+﻿using BankingSimulation.Domain.Accounts;
+
+namespace BankingSimulation.Domain.AccountLogs
 {
     public class AccountLog
     {
         public Guid Id { get; set; }
 
-        public AccountEventTypeEnum EventType { get; set; }
+        public AccountEventTypeEnum EventTypeId { get; set; }
+
+        public AccountEventType EventType { get; set; }
 
         public Guid AccountId { get; set; }
+
+        public Account Account { get; set; }
 
         public DateTime CreatedDate { get; set; }
 
@@ -19,7 +25,7 @@
             {
                 metadata += $"{data.Key}: {data.Value} \r\n";
             }
-            return $"Account {AccountId}: {EventType}: at {CreatedDate.ToString("f")} \r\n {metadata}";
+            return $"Account {AccountId}: {EventTypeId}: at {CreatedDate.ToString("f")} \r\n {metadata}";
         }
     }
 }

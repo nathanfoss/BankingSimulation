@@ -39,7 +39,10 @@ namespace BankingSimulation.Infrastructure.Accounts
 
         public async Task<IEnumerable<Account>> GetByAccountHolder(Guid accountHolderId)
         {
-            return await context.Accounts.Where(x => x.AccountHolderId == accountHolderId).ToListAsync();
+            return await context.Accounts
+                .Include(x => x.AccountType)
+                .Where(x => x.AccountHolder.PublicIdentifier == accountHolderId)
+                .ToListAsync();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace BankingSimulation.Application.Commands
 {
     public class AddAccountCommand : IRequest<Result<Guid>>
     {
-        public Account Account { get; set; }
+        public NewAccountViewModel Account { get; set; }
     }
 
     public class AddAccountCommandHandler : IRequestHandler<AddAccountCommand, Result<Guid>>
@@ -39,8 +39,13 @@ namespace BankingSimulation.Application.Commands
             {
                 var account = request.Account;
                 await ValidateLinkedAccount(account);
-                await ValidateAccountHolder(account);
-                var result = await accountService.Add(account);
+                var holderId = await ValidateAccountHolder(account);
+                var result = await accountService.Add(new Account
+                {
+                    AccountHolderId = holderId,
+                    AccountTypeId = account.AccountTypeId,
+                    LinkedAccountId = account.LinkedAccountId
+                });
                 await PublishAccountEvent(result);
                 return Result<Guid>.Success(result.Id);
             }
@@ -76,27 +81,28 @@ namespace BankingSimulation.Application.Commands
             await accountEventService.Add(events);
         }
 
-        private async Task ValidateAccountHolder(Account account)
+        private async Task<Guid> ValidateAccountHolder(NewAccountViewModel account)
         {
-            if (account.AccountHolder is null)
+            if (string.IsNullOrWhiteSpace(account.AccountHolderName))
             {
                 throw new Exception("Account holder should not be null");
             }
 
-            var accountHolder = await accountHolderService.GetByPublicIdentifier(account.AccountHolder.PublicIdentifier);
+            var accountHolder = await accountHolderService.GetByPublicIdentifier(account.AccountHolderPublicIdentifier);
             if (accountHolder is not null)
             {
-                account.AccountHolderId = accountHolder.Id;
-                return;
+                return accountHolder.Id;
             }
 
-            var holder = account.AccountHolder;
-            holder.Id = Guid.NewGuid();
-            await accountHolderService.Add(holder);
-            account.AccountHolderId = holder.Id;
+            var added = await accountHolderService.Add(new AccountHolder
+            {
+                FullName = account.AccountHolderName,
+                PublicIdentifier = account.AccountHolderPublicIdentifier
+            });
+            return added.Id;
         }
 
-        private async Task ValidateLinkedAccount(Account account)
+        private async Task ValidateLinkedAccount(NewAccountViewModel account)
         {
             if (account.AccountTypeId == AccountTypeEnum.Savings)
             {

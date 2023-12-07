@@ -1,4 +1,5 @@
 ﻿using BankingSimulation.Application.Commands;
+using BankingSimulation.Application.Models;
 using BankingSimulation.Application.Queries;
 using BankingSimulation.Domain.AccountHolders;
 using BankingSimulation.Domain.Accounts;
@@ -32,40 +33,42 @@ namespace BankingSimulation.Infrastructure.Simulator
                 PublicIdentifier = Guid.NewGuid()
             };
 
-            var account1 = new Account
+            var account1 = new NewAccountViewModel
             {
-                Id = Guid.NewGuid(),
                 AccountTypeId = AccountTypeEnum.Savings,
-                AccountHolder = accountHolder1,
-                Balance = 0.0m
-            };
-            var account2 = new Account
-            {
-                Id = Guid.NewGuid(),
-                AccountTypeId = AccountTypeEnum.Checking,
-                AccountHolder = accountHolder1,
-                Balance = 0.0m,
-                LinkedAccountId = account1.Id,
-                LinkedAccount = account1
+                AccountHolderName = accountHolder1.FullName,
+                AccountHolderPublicIdentifier = accountHolder1.PublicIdentifier
             };
 
             var account1Result = await mediatr.Send(new AddAccountCommand
             {
                 Account = account1
             });
+
+            var account1Id = account1Result.Response;
+
+            var account2 = new NewAccountViewModel
+            {
+                AccountTypeId = AccountTypeEnum.Checking,
+                AccountHolderName = accountHolder1.FullName,
+                AccountHolderPublicIdentifier = accountHolder1.PublicIdentifier,
+                LinkedAccountId = account1Id
+            };
             var account2Result = await mediatr.Send(new AddAccountCommand
             {
                 Account = account2
             });
+
+            var account2Id = account2Result.Response;
             var getAccount1Result = await mediatr.Send(new GetAccountQuery
             {
-                AccountId = account1.Id,
+                AccountId = account1Id,
             });
             Console.WriteLine(getAccount1Result.Response.ToString());
 
             var deposit1Response = await mediatr.Send(new DepositMoneyCommand
             {
-                AccountId = account1.Id,
+                AccountId = account1Id,
                 Amount = 100
             });
 
@@ -73,7 +76,7 @@ namespace BankingSimulation.Infrastructure.Simulator
 
             var deposit2Response = await mediatr.Send(new DepositMoneyCommand
             {
-                AccountId = account2.Id,
+                AccountId = account2Id,
                 Amount = 1000
             });
 
@@ -81,7 +84,7 @@ namespace BankingSimulation.Infrastructure.Simulator
 
             var withdraw1Response = await mediatr.Send(new WithdrawMoneyCommand
             {
-                AccountId = account1.Id,
+                AccountId = account1Id,
                 Amount = 10
             });
 
@@ -89,22 +92,22 @@ namespace BankingSimulation.Infrastructure.Simulator
 
             await mediatr.Send(new TransferMoneyCommand
             {
-                FromAccountId = account1.Id,
-                ToAccountId = account2.Id,
+                FromAccountId = account1Id,
+                ToAccountId = account2Id,
                 Amount = 10
             });
 
-            var account1Response = await mediatr.Send(new GetAccountQuery { AccountId = account1.Id });
+            var account1Response = await mediatr.Send(new GetAccountQuery { AccountId = account1Id });
             Console.WriteLine(account1Response.Response.ToString());
 
-            var account2Response = await mediatr.Send(new GetAccountQuery { AccountId = account2.Id });
+            var account2Response = await mediatr.Send(new GetAccountQuery { AccountId = account2Id });
             Console.WriteLine(account2Response.Response.ToString());
 
             Console.WriteLine("Waiting for events");
             using var timer = new PeriodicTimer(period);
             while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync())
             {
-                var account1LogsResponse = await mediatr.Send(new GetAccountLogsQuery { AccountId = account1.Id });
+                var account1LogsResponse = await mediatr.Send(new GetAccountLogsQuery { AccountId = account1Id });
                 var logs = string.Empty;
                 foreach (var log in account1LogsResponse.Response)
                 {
@@ -114,7 +117,7 @@ namespace BankingSimulation.Infrastructure.Simulator
                 Console.WriteLine(logs);
 
                 logs = string.Empty;
-                var account2LogsResponse = await mediatr.Send(new GetAccountLogsQuery { AccountId = account2.Id });
+                var account2LogsResponse = await mediatr.Send(new GetAccountLogsQuery { AccountId = account2Id });
                 foreach (var log in account2LogsResponse.Response)
                 {
                     logs += log.ToString();

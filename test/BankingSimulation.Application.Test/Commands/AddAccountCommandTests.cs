@@ -7,6 +7,7 @@ using Xunit;
 using BankingSimulation.Domain.AccountLogs;
 using BankingSimulation.Domain.Events;
 using BankingSimulation.Domain.AccountTypes;
+using BankingSimulation.Application.Models;
 
 namespace BankingSimulation.Application.Test.Commands
 {
@@ -29,7 +30,7 @@ namespace BankingSimulation.Application.Test.Commands
         public async Task ShouldReturnFailureWhenCheckingAccountHasNoLinkedAccount()
         {
             // Given
-            var account = new Account
+            var account = new NewAccountViewModel
             {
                 AccountTypeId = AccountTypeEnum.Checking,
                 LinkedAccountId = null
@@ -46,7 +47,7 @@ namespace BankingSimulation.Application.Test.Commands
         public async Task ShouldReturnFailureWhenCheckingAccountLinkedAccountInvalid()
         {
             // Given
-            var account = new Account
+            var account = new NewAccountViewModel
             {
                 AccountTypeId = AccountTypeEnum.Checking,
                 LinkedAccountId = Guid.Empty
@@ -65,10 +66,10 @@ namespace BankingSimulation.Application.Test.Commands
         public async Task ShouldReturnFailureWhenValidationFails()
         {
             // Given
-            var account = new Account
+            var account = new NewAccountViewModel
             {
                 AccountTypeId = AccountTypeEnum.Savings,
-                AccountHolder = null
+                AccountHolderName = null
             };
 
             // When
@@ -82,25 +83,22 @@ namespace BankingSimulation.Application.Test.Commands
         public async Task ShouldAddAccountCreatedEvent()
         {
             // Given
-            var account = new Account
+            var account = new NewAccountViewModel
             {
                 AccountTypeId = AccountTypeEnum.Savings,
-                AccountHolder = new AccountHolder
-                {
-                    Id = Guid.NewGuid(),
-                    FullName = "Test Person",
-                    PublicIdentifier = Guid.NewGuid()
-                }
+                AccountHolderName = "Test Person",
+                AccountHolderPublicIdentifier = Guid.NewGuid()
             };
 
             mockAccountService.Setup(x => x.Add(It.IsAny<Account>())).ReturnsAsync((Account account) => account);
+            mockAccountHolderService.Setup(x => x.Add(It.IsAny<AccountHolder>())).ReturnsAsync((AccountHolder accountHolder) => accountHolder);
 
             // When
             var result = await handler.Handle(new AddAccountCommand { Account = account }, CancellationToken.None);
 
             // Then
-            mockAccountEventService.Verify(x => x.Add(It.Is<IEnumerable<AccountEvent>>(l => l.All(e => e.Name == EventTypes.AccountCreated))));
             result.Succeeded.Should().BeTrue();
+            mockAccountEventService.Verify(x => x.Add(It.Is<IEnumerable<AccountEvent>>(l => l.All(e => e.Name == EventTypes.AccountCreated))));
         }
 
         [Fact]
@@ -108,52 +106,46 @@ namespace BankingSimulation.Application.Test.Commands
         {
             // Given
             var linkedAccountId = Guid.NewGuid();
-            var account = new Account
+            var account = new NewAccountViewModel
             {
                 AccountTypeId = AccountTypeEnum.Checking,
-                AccountHolder = new AccountHolder
-                {
-                    Id = Guid.NewGuid(),
-                    FullName = "Test Person",
-                    PublicIdentifier = Guid.NewGuid()
-                },
+                AccountHolderName = "Test Person",
+                AccountHolderPublicIdentifier = Guid.NewGuid(),
                 LinkedAccountId = linkedAccountId
             };
 
             mockAccountService.Setup(x => x.Add(It.IsAny<Account>())).ReturnsAsync((Account account) => account);
             mockAccountService.Setup(x => x.Get(It.Is<Guid>(i => i == linkedAccountId))).ReturnsAsync(new Account { Id = linkedAccountId });
+            mockAccountHolderService.Setup(x => x.Add(It.IsAny<AccountHolder>())).ReturnsAsync((AccountHolder accountHolder) => accountHolder);
 
             // When
             var result = await handler.Handle(new AddAccountCommand { Account = account }, CancellationToken.None);
 
             // Then
-            mockAccountEventService.Verify(x => x.Add(It.Is<IEnumerable<AccountEvent>>(l => l.Any(e => e.Name == EventTypes.AccountLinked))));
             result.Succeeded.Should().BeTrue();
+            mockAccountEventService.Verify(x => x.Add(It.Is<IEnumerable<AccountEvent>>(l => l.Any(e => e.Name == EventTypes.AccountLinked))));
         }
 
         [Fact]
         public async Task ShouldAddAccountHolderIfNotFound()
         {
             // Given
-            var account = new Account
+            var account = new NewAccountViewModel
             {
                 AccountTypeId = AccountTypeEnum.Savings,
-                AccountHolder = new AccountHolder
-                {
-                    Id = Guid.NewGuid(),
-                    FullName = "Test Person",
-                    PublicIdentifier = Guid.NewGuid()
-                }
+                AccountHolderName = "Test Person",
+                AccountHolderPublicIdentifier = Guid.NewGuid()
             };
 
             mockAccountService.Setup(x => x.Add(It.IsAny<Account>())).ReturnsAsync((Account account) => account);
+            mockAccountHolderService.Setup(x => x.Add(It.IsAny<AccountHolder>())).ReturnsAsync((AccountHolder accountHolder) => accountHolder);
 
             // When
             var result = await handler.Handle(new AddAccountCommand { Account = account }, CancellationToken.None);
 
             // Then
-            mockAccountHolderService.Verify(x => x.Add(It.IsAny<AccountHolder>()));
             result.Succeeded.Should().BeTrue();
+            mockAccountHolderService.Verify(x => x.Add(It.IsAny<AccountHolder>()));
         }
 
         [Fact]
@@ -161,14 +153,11 @@ namespace BankingSimulation.Application.Test.Commands
         {
             // Given
             var accountHolderId = Guid.NewGuid();
-            var account = new Account
+            var account = new NewAccountViewModel
             {
                 AccountTypeId = AccountTypeEnum.Savings,
-                AccountHolder = new AccountHolder
-                {
-                    FullName = "Test Person",
-                    PublicIdentifier = Guid.NewGuid()
-                }
+                AccountHolderName = "Test Person",
+                AccountHolderPublicIdentifier = Guid.NewGuid()
             };
 
             mockAccountHolderService.Setup(x => x.GetByPublicIdentifier(It.IsAny<Guid>())).ReturnsAsync((Guid publicId) => new AccountHolder

@@ -15,9 +15,9 @@ namespace BankingSimulation.Infrastructure.AccountHolders
 
         public async Task<AccountHolder> Add(AccountHolder accountHolder)
         {
-            context.AccountHolders.Add(accountHolder);
+            var added = context.AccountHolders.Add(accountHolder);
             await context.SaveChangesAsync();
-            return accountHolder;
+            return added.Entity;
         }
 
         public async Task<AccountHolder> Get(Guid id)

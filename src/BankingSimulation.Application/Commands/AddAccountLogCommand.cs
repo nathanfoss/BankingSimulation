@@ -92,7 +92,7 @@ namespace BankingSimulation.Application.Commands
                     Id = Guid.NewGuid(),
                     AccountId = payload.Item1.Id,
                     CreatedDate = DateTime.UtcNow,
-                    EventType = AccountEventTypeEnum.Withdraw,
+                    EventTypeId = AccountEventTypeEnum.Withdraw,
                     Metadata = new Dictionary<string, string>()
                     {
                         { "Amount", $"{payload.Item2}" },
@@ -117,7 +117,7 @@ namespace BankingSimulation.Application.Commands
                         Id = Guid.NewGuid(),
                         AccountId = payload.Item1.Id,
                         CreatedDate = DateTime.UtcNow,
-                        EventType = AccountEventTypeEnum.Transfer,
+                        EventTypeId = AccountEventTypeEnum.Transfer,
                         Metadata = new Dictionary<string, string>()
                         {
                             { "ToAccount", $"{payload.Item2.Id}" },
@@ -130,7 +130,7 @@ namespace BankingSimulation.Application.Commands
                         Id = Guid.NewGuid(),
                         AccountId = payload.Item2.Id,
                         CreatedDate = DateTime.UtcNow,
-                        EventType = AccountEventTypeEnum.Transfer,
+                        EventTypeId = AccountEventTypeEnum.Transfer,
                         Metadata = new Dictionary<string, string>()
                         {
                             { "FromAccount", $"{payload.Item1.Id}" },
@@ -155,7 +155,7 @@ namespace BankingSimulation.Application.Commands
                     Id = Guid.NewGuid(),
                     AccountId = payload.Item1.Id,
                     CreatedDate = DateTime.UtcNow,
-                    EventType = AccountEventTypeEnum.Deposit,
+                    EventTypeId = AccountEventTypeEnum.Deposit,
                     Metadata = new Dictionary<string, string>()
                     {
                         { "Amount", $"{payload.Item2}" },
@@ -177,7 +177,7 @@ namespace BankingSimulation.Application.Commands
                 {
                     Id = Guid.NewGuid(),
                     CreatedDate = DateTime.Now,
-                    EventType = AccountEventTypeEnum.Closed,
+                    EventTypeId = AccountEventTypeEnum.Closed,
                     AccountId = account.Id,
                     Metadata = new Dictionary<string, string>()
                 };
@@ -196,7 +196,7 @@ namespace BankingSimulation.Application.Commands
                 {
                     Id = Guid.NewGuid(),
                     CreatedDate = DateTime.Now,
-                    EventType = AccountEventTypeEnum.Reassigned,
+                    EventTypeId = AccountEventTypeEnum.Reassigned,
                     AccountId = account.Id,
                     Metadata = new Dictionary<string, string>
                     {
@@ -218,7 +218,7 @@ namespace BankingSimulation.Application.Commands
                 {
                     Id = Guid.NewGuid(),
                     CreatedDate = DateTime.Now,
-                    EventType = AccountEventTypeEnum.Created,
+                    EventTypeId = AccountEventTypeEnum.Created,
                     AccountId = account.Id,
                     Metadata = new Dictionary<string, string>()
                 };
@@ -237,7 +237,7 @@ namespace BankingSimulation.Application.Commands
                 {
                     Id = Guid.NewGuid(),
                     CreatedDate = DateTime.Now,
-                    EventType = AccountEventTypeEnum.Linked,
+                    EventTypeId = AccountEventTypeEnum.Linked,
                     AccountId = account.LinkedAccountId.Value,
                     Metadata = new Dictionary<string, string>
                     {

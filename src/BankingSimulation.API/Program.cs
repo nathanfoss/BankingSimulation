@@ -10,6 +10,7 @@ using BankingSimulation.Infrastructure.AccountLogs;
 using BankingSimulation.Infrastructure.Accounts;
 using BankingSimulation.Infrastructure.AccountTypes;
 using BankingSimulation.Infrastructure.Events;
+using BankingSimulation.Infrastructure.Simulator;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,7 @@ builder.Services
         cfg.RegisterServicesFromAssembly(typeof(GetAccountQuery).Assembly);
     })
     .AddHostedService<AccountEventBackgroundService>()
+    .AddHostedService<EnumSeedBackgroundService>()
     .AddSwaggerGen()
     .AddControllers();
 
@@ -42,5 +44,11 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.MapControllers();
+app.UseCors(policy =>
+{
+    policy.AllowAnyOrigin();
+    policy.AllowAnyMethod();
+    policy.AllowAnyHeader();
+});
 
 app.Run();

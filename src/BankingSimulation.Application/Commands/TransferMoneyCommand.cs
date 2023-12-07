@@ -40,6 +40,10 @@ namespace BankingSimulation.Application.Commands
                     throw new ArgumentException("Invalid Transfer amount");
                 }
 
+                if (request.FromAccountId == request.ToAccountId)
+                {
+                    throw new Exception("Accounts cannot be the same");
+                }
 
                 var fromAccount = await ValidateAccount(request.FromAccountId);
                 var toAccount = await ValidateAccount(request.ToAccountId);
