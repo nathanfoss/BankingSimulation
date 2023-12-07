@@ -4,7 +4,6 @@ using BankingSimulation.Application.Commands;
 using BankingSimulation.Domain.AccountHolders;
 using BankingSimulation.Domain.Accounts;
 using Xunit;
-using BankingSimulation.Domain.AccountLogs;
 using BankingSimulation.Domain.Events;
 using BankingSimulation.Domain.AccountTypes;
 using BankingSimulation.Application.Models;
@@ -18,8 +17,6 @@ namespace BankingSimulation.Application.Test.Commands
         private readonly Mock<IAccountHolderService> mockAccountHolderService = new();
 
         private readonly Mock<IAccountEventService> mockAccountEventService = new();
-
-        private readonly AddAccountCommandHandler handler;
 
         public AddAccountCommandTests()
         {

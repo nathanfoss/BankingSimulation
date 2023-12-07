@@ -15,8 +15,6 @@ namespace BankingSimulation.Application.Test.Commands
 
         private readonly Mock<IAccountLogService> mockAccountLogService = new();
 
-        private readonly AddAccountLogCommandHandler handler;
-
         public AddAccountLogCommandTest()
         {
             handler = new AddAccountLogCommandHandler(mockAccountEventService.Object, mockAccountLogService.Object, mockLogger.Object);

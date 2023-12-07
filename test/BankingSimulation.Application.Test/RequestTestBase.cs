@@ -10,6 +10,8 @@ namespace BankingSimulation.Application.Test
 
         public readonly Mock<IConfiguration> mockConfiguration;
 
+        public T handler;
+
         public RequestTestBase()
         {
             mockLogger = new();

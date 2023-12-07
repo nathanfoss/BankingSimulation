@@ -10,14 +10,11 @@ namespace BankingSimulation.Application.Test.Queries
 {
     public class GetAccountQueryTest : RequestTestBase<GetAccountQueryHandler>
     {
-        private readonly GetAccountQueryHandler target;
-
-        private readonly Mock<IAccountService> mockAccountService;
+        private readonly Mock<IAccountService> mockAccountService = new();
 
         public GetAccountQueryTest()
         {
-            mockAccountService = new();
-            target = new GetAccountQueryHandler(mockAccountService.Object, mockLogger.Object);
+            handler = new GetAccountQueryHandler(mockAccountService.Object, mockLogger.Object);
         }
 
         [Fact]
@@ -27,7 +24,7 @@ namespace BankingSimulation.Application.Test.Queries
             mockAccountService.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(new Account());
 
             // When
-            var result = await target.Handle(new GetAccountQuery(), CancellationToken.None);
+            var result = await handler.Handle(new GetAccountQuery(), CancellationToken.None);
 
             // Then
             result.Succeeded.Should().BeTrue();
@@ -40,7 +37,7 @@ namespace BankingSimulation.Application.Test.Queries
             mockAccountService.Setup(x => x.Get(It.IsAny<Guid>())).Throws(new Exception("Test"));
 
             // When
-            var result = await target.Handle(new GetAccountQuery(), CancellationToken.None);
+            var result = await handler.Handle(new GetAccountQuery(), CancellationToken.None);
 
             // Then
             result.Succeeded.Should().BeFalse();

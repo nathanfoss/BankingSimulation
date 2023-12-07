@@ -14,8 +14,6 @@ namespace BankingSimulation.Application.Test.Commands
 
         private readonly Mock<IAccountEventService> mockAccountEventService = new();
 
-        private readonly WithdrawMoneyCommandHandler handler;
-
         public WithdrawMoneyCommandTest()
         {
             handler = new WithdrawMoneyCommandHandler(mockAccountService.Object, mockAccountEventService.Object, mockLogger.Object);
