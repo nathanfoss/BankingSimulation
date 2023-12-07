@@ -7,8 +7,18 @@ Provide checking and savings account options for clients (checking accounts must
 Each customer can view all of their assigned accounts and view a full transaction history for each account.
 
 ## Architecture
-- Console Application Leveraging the Domain-Driven Design (DDD) Pattern.
+- Console / Web Application Leveraging the Domain-Driven Design (DDD) Pattern.
 - CQRS Powered by MediatR
 - Automated testing provided by XUnit
 - Quality gateways provided by husky commit hooks
+- In-memory DB provided by EF Core
 - Event-Driven Architecture using background services
+- Web front-end powered by Angular Material
+
+## Runbook
+### Web
+- Run the BankingSimulation.API project
+- Navigate to web/banking-simulation-web. Use the Angular cli to serve the UI
+
+### Console
+- Run the BankingSimulation.App project. This service will provision accounts and perform a series of transactions and log the output to the console
