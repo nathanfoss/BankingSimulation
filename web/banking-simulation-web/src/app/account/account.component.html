@@ -9,7 +9,10 @@
     <div class="account-log-container" *ngIf="accountLogs$ | async; let accountLogs;">
         <div class="account-log-heading">
             <h2>History</h2>
-            <small>Events may not display immediately. If you do not see your record, try refreshing the page.</small>
+            <div class="account-log-disclaimer">
+                <button mat-icon-button (click)="refresh()"><mat-icon class >refresh</mat-icon></button>
+                <small>Events may not display immediately. If you do not see your record, try clicking refresh.</small>
+            </div>
         </div>
         <table mat-table [dataSource]="accountLogs" class="account-logs-table">
             <ng-container matColumnDef="eventType">

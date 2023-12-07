@@ -5,6 +5,7 @@ import { RouterModule, ActivatedRoute, Params } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 
 import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
@@ -22,7 +23,7 @@ import { WithdrawMoneyComponent } from '../withdraw-money/withdraw-money.compone
 @Component({
   selector: 'app-account',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatTableModule, MatDividerModule, MatButtonModule, DepositMoneyComponent, WithdrawMoneyComponent],
+  imports: [CommonModule, RouterModule, MatTableModule, MatDividerModule, MatButtonModule, MatIconModule, DepositMoneyComponent, WithdrawMoneyComponent],
   templateUrl: './account.component.html',
   styleUrl: './account.component.scss'
 })
@@ -77,5 +78,9 @@ export class AccountComponent implements OnDestroy {
       tap(_ => this.reloadBs.next(true)),
       takeUntil(this.destroy$)
     ).subscribe();
+  }
+
+  refresh(): void {
+    this.reloadBs.next(true);
   }
 }
