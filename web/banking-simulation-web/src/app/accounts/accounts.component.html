@@ -1,0 +1,35 @@
+<div class="accounts-container">
+  <h2>Active Accounts</h2>
+  <div *ngIf="accounts$ | async; let accounts">
+    <table mat-table [dataSource]="accounts" class="accounts-table">
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef> ID </th>
+          <td mat-cell *matCellDef="let element"><a routerLink="/account/{{element.id}}"> {{element.id}} </a></td>
+          <td mat-footer-cell *matFooterCellDef> Total </td>
+        </ng-container>
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef> Type </th>
+          <td mat-cell *matCellDef="let element"> {{element.accountType.name}} </td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+      
+        <!-- Weight Column -->
+        <ng-container matColumnDef="linkedAccountId">
+          <th mat-header-cell *matHeaderCellDef> Linked Account </th>
+          <td mat-cell *matCellDef="let element"> {{element.linkedAccountId}} </td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+      
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="balance">
+          <th mat-header-cell *matHeaderCellDef> Balance </th>
+          <td mat-cell *matCellDef="let element"> {{element.balance | currency}} </td>
+          <td mat-footer-cell *matFooterCellDef> {{ totalBalance$ | async | currency}} </td>
+        </ng-container>
+      
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+    </table>
+  </div>  
+</div>

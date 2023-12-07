@@ -1,0 +1,34 @@
+<div class="account-container">
+    <div class="account-info-container" *ngIf="account$ | async; let account;">
+        <h2>{{account.accountType.name}}</h2>
+        <button (click)="deposit(account.id)" mat-button color="primary">Deposit</button>
+        <button (click)="withdraw(account.id)" mat-button>Withdraw</button>
+        <h2>Balance: {{account.balance | currency}}</h2>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="account-log-container" *ngIf="accountLogs$ | async; let accountLogs;">
+        <div class="account-log-heading">
+            <h2>History</h2>
+            <small>Events may not display immediately. If you do not see your record, try refreshing the page.</small>
+        </div>
+        <table mat-table [dataSource]="accountLogs" class="account-logs-table">
+            <ng-container matColumnDef="eventType">
+              <th mat-header-cell *matHeaderCellDef> Type </th>
+              <td mat-cell *matCellDef="let element"> {{element.eventType.name}} </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="metadata">
+                <th mat-header-cell *matHeaderCellDef> Balance </th>
+                <td mat-cell *matCellDef="let element"> {{(element.metadata?.Balance | currency) ?? 'N/A'}} </td>
+            </ng-container>
+        
+            <ng-container matColumnDef="createdDate">
+                <th mat-header-cell *matHeaderCellDef> Date </th>
+                <td mat-cell *matCellDef="let element"> {{element.createdDate | date:'short'}} </td>
+            </ng-container>
+            
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </div>
+</div>

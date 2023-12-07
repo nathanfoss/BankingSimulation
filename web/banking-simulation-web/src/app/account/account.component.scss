@@ -1,0 +1,27 @@
+.account-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.account-actions {
+    display: flex;
+    flex-direction: row;
+}
+
+.account-info-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.account-log-container {
+    margin-top: 1em;
+}
+
+.account-log-heading {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
