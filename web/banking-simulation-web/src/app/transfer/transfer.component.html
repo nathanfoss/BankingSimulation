@@ -1,1 +1,31 @@
-<p>transfer works!</p>
+<div *ngIf="accounts$ | async; let accounts">
+    <h2>Transfer</h2>
+    <form [formGroup]="formGroup" class="transfer-form">
+        <div class="transfer-form-account-select">
+            <mat-form-field class="transfer-form-field" required>
+                <mat-label>From Account</mat-label>
+                <mat-select formControlName="fromAccountId">
+                    @for (account of accounts; track account) {
+                    <mat-option [value]="account.id">{{account.accountType.name }} (xxxxx{{ account.id.slice(-4) }})</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="transfer-form-field" required>
+                <mat-label>To Account</mat-label>
+                <mat-select formControlName="toAccountId">
+                    @for (account of toAccountOptions$ | async; track account) {
+                    <mat-option [value]="account.id">{{account.accountType.name }} (xxxxxx{{ account.id.slice(-4) }})</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="transfer-form-amount">
+            <mat-form-field class="transfer-form-field">
+                <mat-label>Amount</mat-label>
+                <input matInput placeholder="100" formControlName="amount">
+            </mat-form-field>
+            <p>Available Balance: {{ availableBalance$ | async | currency }}</p>
+            <button mat-raised-button color="primary" (click)="submit()">Transfer</button>
+        </div>
+    </form>
+</div>

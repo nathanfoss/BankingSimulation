@@ -1,0 +1,17 @@
+.transfer-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.transfer-form-account-select {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.transfer-form-amount {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

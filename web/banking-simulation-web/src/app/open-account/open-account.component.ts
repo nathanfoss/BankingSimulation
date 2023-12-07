@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, FormControlStatus } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 
 import { Observable, Subject, combineLatest } from 'rxjs';
-import { filter, withLatestFrom, mergeMap, map, takeUntil, debounceTime } from 'rxjs/operators';
+import { filter, withLatestFrom, mergeMap, map, tap, takeUntil, debounceTime } from 'rxjs/operators';
 
 import { AccountHolder } from '../core/models/accountHolder.model';
 import { AccountType } from '../core/models/accountType.model';
@@ -57,6 +57,7 @@ export class OpenAccountComponent implements OnInit, OnDestroy {
       return this.accountService.add(newAccount);
     }),
     map(_ => true),
+    tap(_ => this.openAccountForm.reset()),
     takeUntil(this.destroy$)
   );
 
