@@ -1,0 +1,15 @@
+<ng-container *ngIf="accountHolder$ | async; let accountHolder; else login">
+    <h3 class="home-welcome-text">Welcome back {{accountHolder.fullName}}</h3>
+    <div class="home-container">
+        <div class="accounts-container">
+            <app-accounts></app-accounts>
+        </div>
+        <mat-divider [vertical]="true"></mat-divider>
+        <div class="open-account-container">
+            <app-open-account></app-open-account>
+        </div>
+    </div>
+</ng-container>
+<ng-template #login>
+    <app-login></app-login>
+</ng-template>

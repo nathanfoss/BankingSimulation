@@ -1,0 +1,28 @@
+<h1>Login or Open an Account</h1>
+<div class="login-container">
+    <div class="login-item">
+        <h2>Login</h2>
+        <form [formGroup]="loginForm" class="login-form" (submit)="login()">
+            <mat-form-field class="login-form-field" required>
+                <mat-label>Public Identifier</mat-label>
+                <input matInput placeholder="00000000-0000-0000-0000-000000000000" formControlName="identifier">
+            </mat-form-field>
+            <button mat-raised-button color="primary" (click)="login()">Login</button>
+        </form>
+    </div>
+    <mat-divider [vertical]="true" class="login-divider"></mat-divider>
+    <div class="login-item">
+        <h2>Open A Savings Account</h2>
+        <form [formGroup]="openAccountForm" class="login-form" (submit)="openAccount()">
+            <mat-form-field class="login-form-field" required>
+                <mat-label>Full Name</mat-label>
+                <input matInput placeholder="John Smith" formControlName="accountHolderName">
+            </mat-form-field>
+            <mat-form-field class="login-form-field" required>
+                <mat-label>Public Identifier</mat-label>
+                <input matInput placeholder="00000000-0000-0000-0000-000000000000" formControlName="accountHolderPublicIdentifier">
+            </mat-form-field>
+            <button mat-raised-button color="primary" (click)="openAccount()">Create Account</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+.login-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.login-item {
+    flex: 1 1 auto;
+}
+
+.login-divider {
+    margin: 0 2% 0 2%
+}
+
+.login-form {
+    width: 95%;
+    margin: 0 2% 0 2%
+}
+
+.login-form-field {
+    width: 100%;
+}

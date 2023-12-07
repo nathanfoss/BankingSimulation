@@ -1,0 +1,16 @@
+<h2>Open An Account</h2>
+<form [formGroup]="openAccountForm" class="add-account-form">
+    <mat-form-field class="add-account-form-field" required>
+        <mat-label>Account Type</mat-label>
+        <mat-select formControlName="accountTypeId">
+          @for (accountType of accountTypes$ | async; track accountType) {
+            <mat-option [value]="accountType.id">{{accountType.name}}</mat-option>
+          }
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field class="add-account-form-field">
+        <mat-label>Linked Account ID</mat-label>
+        <input matInput placeholder="00000000-0000-0000-0000-000000000000" formControlName="linkedAccountId">
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="openAccount()">Create Account</button>
+</form>
